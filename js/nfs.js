@@ -79,7 +79,7 @@ async function fetchUsuarios() {
 async function fetchUserInfo(nombre, apellidoP, apellidoM) {
     try {
         // Construir la URL con los parámetros de consulta
-        const url = `http://25.61.139.76:3000/find-user-data?nombre=${nombre}&apellidoP=${apellidoP}&apellidoM=${apellidoM}`;
+        const url = `https://25.61.139.76:3000/find-user-data?nombre=${nombre}&apellidoP=${apellidoP}&apellidoM=${apellidoM}`;
         const response = await fetch(url);
 
         if (response.ok) {
@@ -90,7 +90,7 @@ async function fetchUserInfo(nombre, apellidoP, apellidoM) {
             container.innerHTML = '';
             container.innerHTML = `
                 <h2>${usuario.Nombre} ${usuario.ApellidoP} ${usuario.ApellidoM}</h2>
-                <img src="http://25.61.139.76:3000/img/${usuario.imagen}" alt="Imagen de ${usuario.Nombre}" class="user-image" style="width: 150px; border-radius: 50%; margin: 10px 0;">
+                <img src="https://25.61.139.76:3000/img/${usuario.imagen}" alt="Imagen de ${usuario.Nombre}" class="user-image" style="width: 150px; border-radius: 50%; margin: 10px 0;">
                 <p><strong>ID de Usuario:</strong> ${usuario.ID_User}</p>
                 <p><strong>Email:</strong> ${usuario.Email}</p>
                 <p><strong>Teléfono:</strong> ${usuario.Telefono}</p>
@@ -102,7 +102,7 @@ async function fetchUserInfo(nombre, apellidoP, apellidoM) {
                         const redSocial = Object.entries(red)[0];
                         let url = redSocial[1];
                         if (!/^https?:\/\//.test(url)) {
-                            url = 'http://' + url;
+                            url = 'https://' + url;
                         }
 
                         return `<li><a href="${url}" target="_blank">${redSocial[0]}</a></li>`;
