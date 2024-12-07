@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function validateUserData(nombre, apellidoP, apellidoM, password) {
     try {
-        const response = await fetch(`http://25.61.139.76:3000/login?nombre=${nombre}&apellidoP=${apellidoP}&apellidoM=${apellidoM}&password=${password}`);
+        const response = await fetch(`https://25.61.139.76:3000/login?nombre=${nombre}&apellidoP=${apellidoP}&apellidoM=${apellidoM}&password=${password}`);
         
         if (!response.ok) {
             throw new Error('Usuario no encontrado o contraseña incorrecta');
