@@ -26,7 +26,7 @@ body {
 .form-container {
     max-width: 30%;
     margin: 30px auto;
-    padding: 20px;
+    padding: 10px 20px;
     background: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -125,4 +125,27 @@ p {
     cursor: pointer;
     margin: 10px auto;
     margin-bottom: 0;
+}
+
+.conditions {
+    font-size: 12px;
+    color: #666;
+    margin-top: 10px;
+    text-align: center;
+}
+  
+.conditions a {
+    color: #2c1c84;
+    text-decoration: none;
+}
+  
+.conditions a:hover {
+    text-decoration: underline;
+}
+
+.spacing {
+    min-height: 1px;
+    background-color: rgb(65, 65, 65);
+    margin: auto;
+    margin-top: 7px;
 }
