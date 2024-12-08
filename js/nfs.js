@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function validateUserData(nombre, apellidoP, apellidoM, password) {
     try {
-        const response = await fetch(`https://25.61.139.76:3000/login?nombre=${nombre}&apellidoP=${apellidoP}&apellidoM=${apellidoM}&password=${password}`);
+        const response = await fetch(`http://25.61.139.76:3000/login?nombre=${nombre}&apellidoP=${apellidoP}&apellidoM=${apellidoM}&password=${password}`);
         
         if (!response.ok) {
             throw new Error('Usuario no encontrado o contraseña incorrecta');
@@ -79,7 +79,7 @@ async function fetchUsuarios() {
 async function fetchUserInfo(nombre, apellidoP, apellidoM) {
     try {
         // Construir la URL con los parámetros de consulta
-        const url = `https://25.61.139.76:3000/find-user-data?nombre=${nombre}&apellidoP=${apellidoP}&apellidoM=${apellidoM}`;
+        const url = `http://25.61.139.76:3000/find-user-data?nombre=${nombre}&apellidoP=${apellidoP}&apellidoM=${apellidoM}`;
         const response = await fetch(url);
 
         if (response.ok) {
@@ -90,7 +90,7 @@ async function fetchUserInfo(nombre, apellidoP, apellidoM) {
             container.innerHTML = '';
             container.innerHTML = `
                 <h2>${usuario.Nombre} ${usuario.ApellidoP} ${usuario.ApellidoM}</h2>
-                <img src="https://25.61.139.76:3000/img/${usuario.imagen}" alt="Imagen de ${usuario.Nombre}" class="user-image" style="width: 150px; border-radius: 50%; margin: 10px 0;">
+                <img src="http://25.61.139.76:3000/img/${usuario.imagen}" alt="Imagen de ${usuario.Nombre}" class="user-image" style="width: 150px; border-radius: 50%; margin: 10px 0;">
                 <p><strong>ID de Usuario:</strong> ${usuario.ID_User}</p>
                 <p><strong>Email:</strong> ${usuario.Email}</p>
                 <p><strong>Teléfono:</strong> ${usuario.Telefono}</p>
@@ -102,14 +102,14 @@ async function fetchUserInfo(nombre, apellidoP, apellidoM) {
                         const redSocial = Object.entries(red)[0];
                         let url = redSocial[1];
                         if (!/^https?:\/\//.test(url)) {
-                            url = 'https://' + url;
+                            url = 'http://' + url;
                         }
 
                         return `<li><a href="${url}" target="_blank">${redSocial[0]}</a></li>`;
                     }).join('')}
                 </ul>
 
-                <p><strong>Tipo de Usuario:</strong> ${usuario['Tipo usuario']}</p>
+                <p><strong>Tipo de Usuario:</strong> ${usuario.TipoUsuario}</p>
                 <p><strong>Estado:</strong> ${usuario.Estado}</p>
             `;
         } else {
@@ -123,3 +123,4 @@ async function fetchUserInfo(nombre, apellidoP, apellidoM) {
         container.innerHTML = `<p>Error al obtener la información del usuario.</p>`;
     }
 }
+
