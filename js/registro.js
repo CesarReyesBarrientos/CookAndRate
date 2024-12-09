@@ -282,11 +282,11 @@ registrationForm.addEventListener('submit', function (event) {
             emailError.textContent = 'Este correo electrónico ya está registrado';
             emailError.style.display = 'block';
         } else {
+            emailError.textContent = '';
+            emailError.style.display = 'none';
             if (!checkPasswords()) {
                 return;
             }
-            emailError.textContent = '';
-            emailError.style.display = 'none';
             delete data.name;
             delete data.passwd;
             delete data.passwd_v;
@@ -315,7 +315,7 @@ registrationForm.addEventListener('submit', function (event) {
             .then((response) => response.json())
             .then((result) => {
                 console.log('Datos enviados exitosamente:', result);
-                alert('Formulario enviado correctamente.');
+                window.location.href = 'index.html';
             })
             .catch((error) => {
                 console.error('Error al enviar los datos:', error);
