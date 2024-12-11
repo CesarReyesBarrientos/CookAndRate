@@ -71,7 +71,7 @@ body {
 .publicacion {
     display: flex;
     flex-direction: column;
-    max-height: 1200px;
+    max-height: 1000px;
     width: 100%;
     max-width: 800px;
     margin: 40px auto;
