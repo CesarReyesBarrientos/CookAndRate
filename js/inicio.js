@@ -225,7 +225,7 @@ function updateUserInterface() {
         
         // Ejemplo: actualizar imagen de perfil
         if (userResult.imagen) {
-            const userImage = `http://25.61.139.76:3000/img/userIcons/${userResult.imagen}`;
+            const userImage = `http://25.61.139.76:3000${userResult.imagen}`;
             document.getElementById('userIcon').src = userImage;
             // console.log(foodRResult.Seguidos);
         }
