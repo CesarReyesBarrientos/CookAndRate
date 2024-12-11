@@ -37,7 +37,7 @@ async function validateUserData(email, password) {
             // Logica para redirigir
             if (data.token) {
                 localStorage.setItem('authToken', data.token);
-                window.location.href = '/perfil.html';
+                window.location.href = 'paginaprin.html';
             }
         }
     } catch (error) {
