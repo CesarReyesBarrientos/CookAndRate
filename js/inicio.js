@@ -61,7 +61,6 @@ function generarAnuncios(anuncios) {
     });
 }
 
-
 // Configuración del carrusel
 function setupCarousel(carousel) {
 const imagesContainer = carousel.querySelector('.carousel-images');
@@ -133,9 +132,24 @@ window.onload = () => {
             .catch(error => {
                 console.error('Error al obtener datos de usuario:', error);
             });
-            //getChefData(userResult.ID_User);
+            getRecetas();
     }
 };
+
+const getRecetas = async () => {
+    try {
+        const response = await fetch('http://25.61.139.76:3000/read-recetas');
+        if (response.ok) {
+            const data = await response.json();
+            console.log(data);
+        } else {
+            console.error('Error en la respuesta:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error en la solicitud:', error.message);
+    }
+};
+
 
 const parseJWT = (token) => {
     try {
@@ -230,3 +244,114 @@ function updateUserInterface() {
         });
     }
 }
+
+// Recetas
+
+async function fetchRecetas() {
+    try {
+      // Obtener recetas
+      const recetasResponse = await fetch('http://25.61.139.76:3000/read-recetas');
+      const recetasData = await recetasResponse.json();
+      const recetas = recetasData.recetas;
+  
+      // Obtener chefs
+      const chefsResponse = await fetch('http://25.61.139.76:3000/read-chefs');
+      const chefsData = await chefsResponse.json();
+      const chefs = chefsData.chefs;
+  
+      // Obtener usuarios
+      const usersResponse = await fetch('http://25.61.139.76:3000/read-users');
+      const usersData = await usersResponse.json();
+      const users = usersData.users;
+  
+      generarPublicaciones(recetas, chefs, users);
+    } catch (error) {
+      console.error('Error al obtener los datos:', error);
+    }
+  }
+  
+  function generarPublicaciones(recetas, chefs, users) {
+    const publicacionesContainer = document.querySelector('.publicaciones');
+    publicacionesContainer.innerHTML = ''; 
+
+    recetas.forEach(receta => {
+      // Encontrar al chef correspondiente
+      const chef = chefs.find(c => c.Id_Chef === receta.Id_Chef);
+      const user = chef ? users.find(u => u.ID_User === chef.ID_User) : null;
+  
+    
+      const chefImage = user
+        ? `http://25.61.139.76:3000/img/userIcons/${user.imagen}`
+        : 'http://25.61.139.76:3000/img/userIcons/default.png';
+      const chefName = user ? `${user.Nombre} ${user.ApellidoP}` : 'Chef Desconocido';
+  
+      const publicacion = document.createElement('div');
+      publicacion.classList.add('publicacion');
+      
+      publicacion.innerHTML = `
+        <div class="containerColumn">
+            <div class="containerRow">
+                <div class="containerColumn">
+                    <div><a href="#" target="_blank"><img class="imgPubli" src="${chefImage}" alt="Foto de perfil"></a></div>
+                </div>
+                <div class="containerColumn">
+                    <div class="main-text">${receta.Titulo_Receta}</div>
+                    <div class="subtext">${chefName}</div>
+                </div>
+            </div>
+            <div>
+                <strong class="contenido">Ingredientes:</strong><br>
+                ${Object.entries(receta.Ingredientes).map(([key, value]) => `&nbsp;&nbsp;${key}: ${value}<br>`).join('')}
+                <br>
+                <strong class="contenido">¡A cocinar!</strong><br>
+                ${receta.Pasos_Elaboracion.map((paso, i) => `&nbsp;&nbsp;${i + 1}. ${paso}<br>`).join('')}
+            </div>
+        </div>
+        <div class="carousel">
+            <button class="btn left">&lt;</button>
+            <div class="carousel-images">
+                ${receta.Imagenes.map(imgUrl => `<img src="${imgUrl}" alt="Imagen de receta">`).join('')}
+            </div>
+            <button class="btn right">&gt;</button>
+        </div>
+    `;
+      // Comentarios
+    //   const comentarios = document.createElement('div');
+    //   comentarios.classList.add('comentarios');
+    //   comentarios.innerHTML = `
+    //     <textarea placeholder="Deja tu comentario..."></textarea>
+    //     <button>Comentar</button>
+    //   `;
+    //   publicacion.appendChild(comentarios);
+  
+      // Lista de comentarios
+    //   const comentariosList = document.createElement('div');
+    //   comentariosList.classList.add('comentarios-list');
+    //   comentariosList.innerHTML = receta.Comentarios.map(c => `
+    //     <div class="comentario-item"><strong>${c.Usuario}:</strong> ${c.Comentario}</div>
+    //   `).join('');
+    //   publicacion.appendChild(comentariosList);
+  
+      publicacionesContainer.appendChild(publicacion);
+  
+      setupCarousel(publicacion.querySelector('.carousel'));
+    });
+  }
+
+  
+  const tabs = document.querySelectorAll('.tab');
+  const tabContents = document.querySelectorAll('.tab-content');
+  
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+  
+      tab.classList.add('active');
+      document.querySelector(`.${tab.dataset.target}`).classList.add('active');
+    });
+  });
+  
+  document.addEventListener('DOMContentLoaded', fetchRecetas);
+
+// Fin Recetas
