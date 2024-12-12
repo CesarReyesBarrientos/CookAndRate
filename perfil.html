@@ -1,49 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Ahom&display=swap" rel="stylesheet">
-  <script src="https://kit.fontawesome.com/48174618d9.js" crossorigin="anonymous"></script>
-  <script src="js/getUser.js" type="module"></script>
-  <title>Perfil</title>
-  <link rel="stylesheet" href="estilos/perfilestilos.css">
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Ahom&display=swap" rel="stylesheet">
+   <script src="https://kit.fontawesome.com/48174618d9.js" crossorigin="anonymous"></script>
+   <script src="js/perfilUser.js" type="module"></script>
+   <title>Perfil</title>
+   <link rel="stylesheet" href="estilos/perfilestilos.css">
 </head>
 <body>
-  <div class="profile-page">
-    <div class="cover-photo">
-      <img src="images/fondo.jpeg" alt="Foto de portada">
-      <div class="profile-photo">
-        <img src="images/cocinero.png" alt="Foto de perfil">
-      </div>
-    </div>
+   <div class="profile-page">
+     <div class="cover-photo">
+       <img src="images/fondo.jpeg" alt="Foto de portada">
+       <div class="profile-photo">
+         <img src="images/cocinero.png" alt="Foto de perfil">
+       </div>
+     </div>
+     
+     <div class="profile-details">
+       <h2></h2>
+       <p>1,234 seguidores</p>
+       <p></p>
+     </div>
+     
 
-    <div class="profile-details">
-      <h2>Chef Siobb</h2>
-      <p>1,234 seguidores</p>
-      <p>Chef experta en cocina italiana y postres gourmet.</p>
-    </div>
-
-    <div class="tabs">
-      <div class="tab active" data-target="publicaciones">Publicaciones</div>
-      <div class="tab" data-target="gallery">Galería de fotos</div>
-    </div>
-
-    <div class="tab-content publicaciones active">
-      <!-- Aquí se generarán dinámicamente las publicaciones -->
-    </div>
-
-    <div class="tab-content gallery">
-      <div class="photo-grid">
-        <img src="images/lasagna.jpg" alt="Foto 1">
-        <img src="images/bechamel.webp" alt="Foto 2">
-        <img src="images/pasta.jpg" alt="Foto 3">
-        <img src="images/joqueis.jpeg" alt="Foto 4">
-      </div>
-    </div>
-  </div> 
-  <script src="js/perfilUser.js"></script>
+     <div class="profile-edit">
+       <!-- Contenedor para los botones de editar perfil y cerrar sesión -->
+       <div class="button-container">
+         <button id="edit-profile">Editar Perfil</button>
+         <button id="logout">Cerrar Sesión</button>
+       </div>
+       
+       <!-- Botón de desactivar cuenta -->
+       <button id="deactivate-account" class="deactivate-btn">Desactivar Cuenta</button>
+       
+       <!-- Modal -->
+       <div id="edit-modal" class="modal">
+         <div class="modal-content">
+           <span class="close-modal">&times;</span>
+           <h2>Editar Perfil</h2>
+           <form id="edit-form" method="POST" enctype="multipart/form-data" style="display:block;">
+             <label for="nombre">Nombre:</label>
+             <input type="text" id="nombre" name="nombre" value="Cesar">
+             
+             <label for="apellidoP">Apellido Paterno:</label>
+             <input type="text" id="apellidoP" name="apellidoP" value="Reyes">
+             
+             <label for="apellidoM">Apellido Materno:</label>
+             <input type="text" id="apellidoM" name="apellidoM" value="Barrientos">
+             
+             <label for="email">Email:</label>
+             <input type="email" id="email" name="email" value="cesar.correo.pruebas09@gmail.com">
+             
+             <label for="telefono">Teléfono:</label>
+             <input type="text" id="telefono" name="telefono" value="+524491234567">
+             
+             <label for="biografia">Biografía:</label>
+             <textarea id="biografia" name="biografia">Tonto y bobo.</textarea>
+             
+             <label for="imagen">Cambiar Imagen de Perfil:</label>
+             <input type="file" id="imagen" name="imagen" accept="image/*">
+             <img id="preview-imagen" style="max-width: 100px; display: none;" alt="Vista previa de la imagen">
+             
+             <button type="submit">Guardar Cambios</button>
+           </form>
+         </div>
+       </div>
+     </div>
+     
+     <div class="tabs">
+       <div class="tab active" data-target="publicaciones">Publicaciones</div>
+       <div class="tab" data-target="gallery">Galería de fotos</div>
+     </div>
+     
+     <div class="tab-content publicaciones active">
+       <!-- Aquí se generarán dinámicamente las publicaciones -->
+     </div>
+     
+     <div class="tab-content gallery">
+       <div class="photo-grid">
+         <img src="images/lasagna.jpg" alt="Foto 1">
+         <img src="images/bechamel.webp" alt="Foto 2">
+         <img src="images/pasta.jpg" alt="Foto 3">
+         <img src="images/joqueis.jpeg" alt="Foto 4">
+       </div>
+     </div>
+   </div>
 </body>
 </html>
