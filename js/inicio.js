@@ -364,17 +364,21 @@ async function fetchCombinedPublications() {
     }
 }
 
+
 function generarPublicacionesCombinadas(publications) {
     const publicacionesContainer = document.querySelector('.publicaciones');
-    publicacionesContainer.innerHTML = ''; 
+    publicacionesContainer.innerHTML = ''; // Limpiar el contenedor
 
     publications.forEach(publication => {
+        // Crear contenedores para cada publicación
         const publicacion = document.createElement('div');
-        publicacion.classList.add('publicacion');
+        publicacion.classList.add('publicacion'); // Añadir la clase para la publicación
+        const publicidad = document.createElement('div');
+        publicidad.classList.add('publicidad'); // Añadir la clase para la publicidad
 
         if (publication.type === 'anuncio') {
             const anuncio = publication.data;
-            publicacion.innerHTML = `
+            publicidad.innerHTML = `
                 <div class="containerColumn">
                     <div class="containerRow">
                         <div class="containerColumn">
@@ -397,6 +401,13 @@ function generarPublicacionesCombinadas(publications) {
                     <button class="btn right">&gt;</button>
                 </div>
             `;
+            publicacionesContainer.appendChild(publicidad); // Añadir el anuncio al contenedor de publicidades
+            setTimeout(() => {
+                const carouselElement = publicidad.querySelector('.carousel');
+                if (carouselElement) {
+                    setupCarousel(carouselElement); // Configurar el carrusel
+                }
+            }, 0);
         } else if (publication.type === 'receta') {
             const receta = publication.data;
             const user = publication.user;
@@ -432,13 +443,22 @@ function generarPublicacionesCombinadas(publications) {
                 </div>
                 <div class="parent-div">
                     <div class="child-div">
-                        <i class="fa-regular fa-heart fa-xl" style="color: #000000;"></i><p>Me encanta</p>
+                        <!-- Corazón -->
+                        <i class="fa-regular fa-heart fa-xl icon-off" style="color: #000000;"></i> 
+                        <i class="fa-solid fa-heart fa-xl icon-on icon-on" style="color: #ff0000; display: none;"></i>
+                        <p>Me encanta</p>
                     </div>
                     <div class="child-div">
-                        <i class="fa-regular fa-thumbs-up fa-xl" style="color: #000000;"></i><p>Me gusta</p>
+                        <!-- Like -->
+                        <i class="fa-regular fa-thumbs-up fa-xl icon-off" style="color: #000000;"></i>
+                        <i class="fa-solid fa-thumbs-up fa-xl icon-on" style="color: #11306f; display: none;"></i>
+                        <p>Me gusta</p>
                     </div>
                     <div class="child-div">
-                        <i class="fa-regular fa-thumbs-down fa-xl" style="color: #000000;"></i><p>No me gusta</p>
+                        <!-- Dislike -->
+                        <i class="fa-regular fa-thumbs-down fa-xl icon-off" style="color: #000000;"></i>
+                        <i class="fa-solid fa-thumbs-down fa-xl icon-on" style="color: #11306f; display: none;"></i>
+                        <p>No me gusta</p>
                     </div>
                     <div class="child-div last-child" >
                         <input class="rating" type="number" min="0" max="5" value="0">
@@ -446,11 +466,41 @@ function generarPublicacionesCombinadas(publications) {
                     </div>
                 </div>
             `;
+            publicacionesContainer.appendChild(publicacion); // Añadir la receta al contenedor de publicaciones
+            setTimeout(() => {
+                const carouselElement = publicacion.querySelector('.carousel');
+                if (carouselElement) {
+                    setupCarousel(carouselElement); // Configurar el carrusel
+                }
+            }, 0);
         }
-
-        publicacionesContainer.appendChild(publicacion);
-        setupCarousel(publicacion.querySelector('.carousel'));
     });
 }
 
 document.addEventListener('DOMContentLoaded', fetchCombinedPublications);
+
+document.addEventListener('mouseover', (event) => {
+    if (event.target.classList.contains('icon-off')) {
+        const iconOff = event.target;
+        const iconOn = iconOff.nextElementSibling;
+        if (iconOn) {
+            iconOff.style.display = 'none';
+            iconOn.style.display = 'inline-block';
+        }
+    }
+});
+
+document.addEventListener('mouseout', (event) => {
+    if (event.target.classList.contains('icon-on')) {
+        const iconOn = event.target;
+        const iconOff = iconOn.previousElementSibling;
+        if (iconOff) {
+            iconOff.style.display = 'inline-block';
+            iconOn.style.display = 'none';
+        }
+    }
+});
+
+
+
+

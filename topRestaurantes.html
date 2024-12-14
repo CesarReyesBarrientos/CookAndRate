@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mejores Restaurantes</title>
+    <link rel="stylesheet" href="estilos/estilosRestaurantes.css">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .map-container {
+            width: 900px;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+        .restaurant-section {
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="conte">
+    <h1>The World's 5 Best Restaurants</h1>
+    <img src="./images/header.jpg" alt="">
+    </div>
+
+    <div id="restaurant-1" class="restaurant-section centered" style="max-width: 900px;  margin: 0 auto;">
+        <h2>Disfrutar, Barcelona</h2>
+        <p style="font-size: 0.9em; color: gray;">Carrer de Villarroel, 163, 08036 Barcelona, Spain</p> 
+        <img src="./images/disfrutar.jpg" alt="">
+        <p class="interlineado">Disfrutar is a world-renowned Michelin-starred restaurant located in the heart of Barcelona. Known for its avant-garde culinary creations and exceptional dining experience, Disfrutar offers a fusion of innovative techniques and Mediterranean flavors. Each dish is a unique masterpiece, making it a must-visit destination for food enthusiasts worldwide. The chefs at Disfrutar craft each meal with passion and precision, delivering a sensory experience that transcends the traditional boundaries of dining. With a commitment to creativity and excellence, Disfrutar continues to evolve and captivate its guests with bold flavors and stunning presentations, making it one of the top culinary destinations in Europe.</p>
+        <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; display: inline-block;">
+            <strong>Phone:</strong> +34 933 48 68 96
+        </div>
+        <p><strong>Location:</strong></p>
+        <div id="map-1" class="map-container"></div>
+    </div>
+    
+    <div id="restaurant-2" class="restaurant-section centered" style="max-width: 900px;; margin: 0 auto;">
+        <h2>Pujol, Mexico City</h2>
+        <p style="font-size: 0.9em; color: gray;">Calle de Tennyson 133, Polanco, 11550 Ciudad de México, Mexico</p>
+        <img src="./images/pujol.jpg" alt="">
+        <p class="interlineado">Pujol, led by Chef Enrique Olvera, is a fine-dining experience that blends traditional Mexican ingredients with modern culinary techniques. With an ever-evolving menu, Pujol offers a sophisticated take on Mexican flavors, and it is recognized as one of the best restaurants in Latin America. The restaurant prides itself on its innovative approach to Mexican cuisine, incorporating elements of molecular gastronomy and local produce to create dishes that are both surprising and memorable. Pujol's tasting menu is a journey through Mexico's diverse culinary landscape, showcasing the rich cultural heritage and the bold flavors that make Mexican food unique. Whether it's the famous mole or the perfectly cooked seafood, Pujol offers a one-of-a-kind dining experience that continues to push the boundaries of Mexican gastronomy.</p>
+        <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; display: inline-block;">
+            <strong>Phone:</strong> +52 55 5282 6825
+        </div>
+        <p><strong>Location:</strong></p>
+        <div id="map-2" class="map-container"></div>
+    </div>
+    
+    <div id="restaurant-3" class="restaurant-section centered" style="max-width: 900px;  margin: 0 auto;">
+        <h2>Table by Bruno Verjus, Paris</h2>
+        <p style="font-size: 0.9em; color: gray;">8 Rue de la Tour d'Auvergne, 75009 Paris, France</p>
+        <img src="./images/table.jpg" alt="">
+        <p class="interlineado">Table by Bruno Verjus is an intimate dining experience in Paris, offering a menu that is based on seasonal and local ingredients. The restaurant is celebrated for its open kitchen concept and unique take on French cuisine, making it a favorite for food lovers seeking a personalized experience. Chef Bruno Verjus’s philosophy revolves around transparency and a deep respect for the ingredients, allowing them to shine through in every dish. The atmosphere is relaxed yet refined, with an emphasis on hospitality and making guests feel at home. Each course is thoughtfully crafted with an attention to detail, from the perfectly balanced appetizers to the beautifully presented main dishes and desserts. It’s a celebration of both simplicity and sophistication, providing a memorable culinary journey that captures the essence of French dining.</p>
+        <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; display: inline-block;">
+            <strong>Phone:</strong> +33 1 48 78 72 09
+        </div>
+        <p><strong>Location:</strong></p>
+        <div id="map-3" class="map-container"></div>
+    </div>
+    
+    <div id="restaurant-4" class="restaurant-section centered" style="max-width: 900px; margin: 0 auto;">
+        <h2>Atomix, New York</h2>
+        <p style="font-size: 0.9em; color: gray;">104 E 30th St, New York, NY 10016, USA</p>
+        <img src="./images/atomix.jpg" alt="">
+        <p class="interlineado">Atomix is a modern Korean restaurant in New York, offering an immersive dining experience with an innovative approach to traditional Korean cuisine. With a focus on bold flavors and artistic presentations, Atomix has earned high praise from critics and patrons alike. The restaurant offers a multi-course tasting menu that explores the depths of Korean culinary traditions, from its fermented staples to the diverse regional flavors. Chef and owner, Junghyun Park, combines traditional techniques with contemporary elements to craft dishes that are both visually stunning and packed with layers of flavor. Atomix has garnered attention for its dedication to delivering a unique and elevated dining experience that celebrates the complexity of Korean food. Every meal is a journey through the rich culinary history of Korea, paired with an immersive atmosphere that enhances the overall experience.</p>
+        <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; display: inline-block;">
+            <strong>Phone:</strong> +1 212-729-1414
+        </div>
+        <p class="interlineado"><strong>Location:</strong></p>
+        <div id="map-4" class="map-container"></div>
+    </div>
+    
+    <div id="restaurant-5" class="restaurant-section centered" style="max-width: 900px;  margin: 0 auto;">
+        <h2>Gaggan, Bangkok</h2>
+        <p style="font-size: 0.9em; color: gray;">68/1 Soi Langsuan, Ploenchit Road, Lumpini, Pathumwan, Bangkok 10330, Thailand</p>
+        <img src="./images/bangkok.jpg" alt="">
+        <p class="interlineado">Gaggan is a progressive Indian restaurant located in Bangkok, renowned for its creative and innovative approach to Indian cuisine. The restaurant combines traditional flavors with contemporary techniques, offering a unique tasting menu that delights food enthusiasts from around the world. Chef Gaggan Anand has revolutionized Indian cuisine by pushing the boundaries of what Indian food can be, incorporating global influences while staying true to his roots. Each dish at Gaggan is designed to challenge your expectations and evoke a range of emotions, from playful presentations to intense flavors that captivate the senses. The restaurant's cutting-edge techniques, including molecular gastronomy, make Gaggan a one-of-a-kind dining destination that offers an unforgettable culinary adventure. With an emphasis on storytelling through food, Gaggan offers a truly unique experience that leaves guests with lasting memories.</p>
+        <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; display: inline-block;">
+            <strong>Phone:</strong> +66 2 652 1700
+        </div>
+        <p><strong>Location:</strong></p>
+        <div id="map-5" class="map-container"></div>
+    </div>
+    
+    <script>
+        fetch('http://25.61.139.76:3000/mapbox-token')
+            .then(response => response.json())
+            .then(data => {
+                mapboxgl.accessToken = data.token;
+    
+                // Información manual de los restaurantes
+                const restaurantData = {
+                    1: {
+                        name: "Disfrutar",
+                        image: "https://i0.wp.com/yummybarcelona.com/wp-content/uploads/2023/10/restaurant-disfrutar-barcelona-3.jpg?resize=900%2C675&ssl=1",
+                        hours: "Monday to Sunday: 1:00 PM - 3:00 PM, 8:00 PM - 10:00 PM",
+                        review: "An excellent gastronomic experience with innovative flavors."
+                    },
+                    2: {
+                        name: "Pujol",
+                        image: "https://images.squarespace-cdn.com/content/v1/62c0918972f37e3fad1564cb/14c3438e-2b08-45b2-8d37-1d6526290163/JSa_Pujol_LGM_0072+%28Header%29.jpg",
+                        hours: "Tuesday to Saturday: 1:00 PM - 10:30 PM",
+                        review: "A tribute to traditional and contemporary Mexican cuisine."
+                    },
+                    3: {
+                        name: "Table by Bruno Verjus",
+                        image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhm0kl5FUB449IqCvGDblxMZtpmCYYKYlGQJ6FbqP2UnvqdMqNgkrdErO5o0B_8SeuNQPd-r-r-zeQAXyJd1fXKhGG1d7LHtqMPb8L0PzjWzFPBCngDq0ib2GZa0Sfy-BtneFsEDdH0yek/s1600/table+restaurant+bruno+verjus+paris+75012+exterior.jpg",
+                        hours: "Tuesday to Saturday: 12:00 PM - 2:30 PM, 7:00 PM - 10:00 PM",
+                        review: "A cozy spot with an artistic culinary proposal."
+                    },
+                    4: {
+                        name: "Atomix",
+                        image: "https://images.squarespace-cdn.com/content/v1/5ac3bec4aa49a18caab02bf4/1648580412075-5P22YY93JUD4GPIHSG5Y/220202_Atomix_8184.jpg?format=2500w",
+                        hours: "Wednesday to Sunday: 6:00 PM - 11:00 PM",
+                        review: "A fusion of modern Korean cuisine with a sophisticated ambiance."
+                    },
+                    5: {
+                        name: "Gaggan",
+                        image: "https://gaggan.com/wp-content/uploads/2023/07/img_-gaggan-gg-2.png",
+                        hours: "Tuesday to Sunday: 6:00 PM - 11:00 PM",
+                        review: "Creativity in every dish with flavors from Southeast Asia."
+                    }
+
+                };
+    
+                // Función para inicializar un mapa
+                function initMap(containerId, restaurantId) {
+                    // Obtener los datos del restaurante manualmente
+                    const restaurant = restaurantData[restaurantId];
+    
+                    // Coordenadas simuladas (modificar con datos reales si se tienen)
+                    const coordinates = {
+                        1: { lng: 2.15899, lat: 41.3825 },  // Disfrutar, Barcelona
+                        2: { lng: -99.1677, lat: 19.4326 }, // Pujol, Mexico City
+                        3: { lng: 2.3522, lat: 48.8566 },   // Paris
+                        4: { lng: -73.9851, lat: 40.758 },  // New York
+                        5: { lng: 100.5018, lat: 13.7563 }  // Bangkok
+                    };
+    
+                    const { lng, lat } = coordinates[restaurantId];
+    
+                    // Crear el mapa
+                    const map = new mapboxgl.Map({
+                        container: containerId,
+                        style: 'mapbox://styles/mapbox/streets-v11',
+                        center: [lng, lat],
+                        zoom: 18
+                    });
+    
+                    // Agregar marcador con ventana emergente personalizada
+                    new mapboxgl.Marker()
+                        .setLngLat([lng, lat])
+                        .setPopup(new mapboxgl.Popup().setHTML(`
+                            <div style="text-align: center;">
+                                <h3>${restaurant.name}</h3>
+                                <img src="${restaurant.image}" alt="${restaurant.name}" style="width: 100%; max-width: 300px; height: auto; border-radius: 10px; margin: 10px 0;">
+                                <p><strong>Horarios:</strong> ${restaurant.hours}</p>
+                                <p><strong>Reseña:</strong> ${restaurant.review}</p>
+                            </div>
+                        `))
+                        .addTo(map);
+                }
+    
+                // Inicializar mapas para cada restaurante
+                initMap('map-1', 1);
+                initMap('map-2', 2);
+                initMap('map-3', 3);
+                initMap('map-4', 4);
+                initMap('map-5', 5);
+            })
+            .catch(error => console.error('Error obteniendo el token:', error));
+    </script>
+    
+</body>
+</html>
