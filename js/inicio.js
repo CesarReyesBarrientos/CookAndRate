@@ -400,7 +400,7 @@ function generarPublicacionesCombinadas(publications) {
                 <div class="containerColumn">
                     <div class="containerRow">
                         <div class="containerColumn">
-                            <div><a href="#" target="_blank"><img class="imgPubli" src="${chefImage}" alt="Foto de perfil"></a></div>
+                            <div><a><img class="imgPubli Id_User" id="${user.ID_User}" src="${chefImage}" alt="Foto de perfil"></a></div>
                         </div>
                         <div class="containerColumn">
                             <div class="main-text">${receta.Titulo_Receta}</div>
@@ -427,20 +427,20 @@ function generarPublicacionesCombinadas(publications) {
                 <div class="parent-div">
                     <div class="child-div">
                         <!-- Corazón -->
-                        <i class="fa-regular fa-heart fa-xl icon-off" style="color: #000000;"></i> 
-                        <i class="fa-solid fa-heart fa-xl icon-on icon-on" style="color: #ff0000; display: none;"></i>
+                        <i class="fa-regular fa-heart fa-xl icon-off interact" id="int-01" style="color: #000000;"></i> 
+                        <i class="fa-solid fa-heart fa-xl icon-on icon-on interact" id="int-02" style="color: #ff0000; display: none;"></i>
                         <p>Me encanta</p>
                     </div>
                     <div class="child-div">
                         <!-- Like -->
-                        <i class="fa-regular fa-thumbs-up fa-xl icon-off" style="color: #000000;"></i>
-                        <i class="fa-solid fa-thumbs-up fa-xl icon-on" style="color: #11306f; display: none;"></i>
+                        <i class="fa-regular fa-thumbs-up fa-xl icon-off interact" id="int-03" style="color: #000000;"></i>
+                        <i class="fa-solid fa-thumbs-up fa-xl icon-on interact" id="int-04" style="color: #11306f; display: none;"></i>
                         <p>Me gusta</p>
                     </div>
                     <div class="child-div">
                         <!-- Dislike -->
-                        <i class="fa-regular fa-thumbs-down fa-xl icon-off" style="color: #000000;"></i>
-                        <i class="fa-solid fa-thumbs-down fa-xl icon-on" style="color: #11306f; display: none;"></i>
+                        <i class="fa-regular fa-thumbs-down fa-xl icon-off interact" id="int-05" style="color: #000000;"></i>
+                        <i class="fa-solid fa-thumbs-down fa-xl icon-on interact" id="int-06" style="color: #11306f; display: none;"></i>
                         <p>No me gusta</p>
                     </div>
                     <div class="child-div last-child" >
@@ -492,8 +492,21 @@ document.addEventListener('click', (event) => {
     if (event.target.classList.contains('Id_receta')) {
         const recetaId = event.target.id;
         console.log('El ID de la receta es:', recetaId);
-        window.location.href = `/pagina-receta?id=${recetaId}`;
+        window.open(`nutrition.html?id=${recetaId}`, '_blank');
     }
+    if (event.target.classList.contains('Id_User')) {
+        const userid = event.target.id;
+        console.log('El ID del usuario:', userid);
+        // window.open(`/pagina-usuario?id=${userid}`, '_blank');
+    }
+    if (event.target.classList.contains('interact')) {
+        const interactID = event.target.id;
+        console.log('El ID de la interaccion es: ', interactID);
+    }
+});
+
+document.addEventListener('click', (event) => {
+    
 });
 
 

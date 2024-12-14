@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Información Nutricional </title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+        /* Make vitamins column wider */
+        th:nth-child(8), td:nth-child(8) {
+            width: 30%;
+        }
+        /* Styling for vitamins list */
+        td ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <img src=".//images/cocinerito.png" alt="Icono nutricional" style="vertical-align: middle; width: 70px; margin-right: 10px;">
+            Información Nutricional
+        </h1>
+        <h4>Proporcion: 100 gramos</h4>
+        <table id="nutritionTable">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Calorías</th>
+                    <th>Proteínas</th>
+                    <th>Carbohidratos</th>
+                    <th>Grasas</th>
+                    <th>Calcio</th>
+                    <th>Hierro</th>
+                    <th>Vitaminas</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Aquí se insertarán los datos dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let recetaId;
+        function getQueryParam(name) {  
+               const urlParams = new URLSearchParams(window.location.search);   
+                 return urlParams.get(name);
+                 } 
+                recetaId = getQueryParam('id');
+                 if (recetaId) {     
+                    console.log('El ID de la receta es:', recetaId);
+                  } else {    
+                     console.log('No se proporcionó un ID de receta');
+                 }
+                 
+        document.addEventListener('DOMContentLoaded', async () => {
+            const tableBody = document.getElementById('nutritionTable').querySelector('tbody');
+         const idReceta = recetaId; // Cambia por el ID de la receta deseada
+        
+            try {
+                const response = await fetch(`http://25.61.139.76:3000/ingredient-nutrition?id_receta=${idReceta}`);
+        
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+        
+                const data = await response.json();
+        
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+        
+                    // Crear celdas para cada columna
+                    const nombreCell = document.createElement('td');
+                    nombreCell.textContent = item.nombre;
+                    row.appendChild(nombreCell);
+        
+                    const caloriasCell = document.createElement('td');
+                    caloriasCell.textContent = item.calorias || 'N/A';
+                    row.appendChild(caloriasCell);
+        
+                    const proteinasCell = document.createElement('td');
+                    proteinasCell.textContent = item.proteinas || 'N/A';
+                    row.appendChild(proteinasCell);
+        
+                    const carbohidratosCell = document.createElement('td');
+                    carbohidratosCell.textContent = item.carbohidratos || 'N/A';
+                    row.appendChild(carbohidratosCell);
+        
+                    const grasasCell = document.createElement('td');
+                    grasasCell.textContent = item.grasas || 'N/A';
+                    row.appendChild(grasasCell);
+        
+                    const calcioCell = document.createElement('td');
+                    calcioCell.textContent = item.nutrientesPrincipales?.calcio || 'N/A';
+                    row.appendChild(calcioCell);
+        
+                    const hierroCell = document.createElement('td');
+                    hierroCell.textContent = item.nutrientesPrincipales?.hierro || 'N/A';
+                    row.appendChild(hierroCell);
+        
+                    const vitaminasCell = document.createElement('td');
+                    const vitaminasList = document.createElement('ul');
+                    if (item.nutrientesPrincipales?.vitaminas) {
+                        item.nutrientesPrincipales.vitaminas.forEach(vitamina => {
+                            const vitaminaItem = document.createElement('li');
+                            vitaminaItem.textContent = `${vitamina.nombre}: ${vitamina.cantidad}`;
+                            vitaminasList.appendChild(vitaminaItem);
+                        });
+                    } else {
+                        const noVitaminasItem = document.createElement('li');
+                        noVitaminasItem.textContent = 'N/A';
+                        vitaminasList.appendChild(noVitaminasItem);
+                    }
+                    vitaminasCell.appendChild(vitaminasList);
+                    row.appendChild(vitaminasCell);
+        
+                    // Agregar la fila a la tabla
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error al obtener los datos:', error);
+                alert('Hubo un problema al obtener los datos. Por favor, inténtalo más tarde.');
+            }
+        });
+
+    </script>
+</body>
+</html>
