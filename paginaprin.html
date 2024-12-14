@@ -1,144 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <link rel="preconnect" href="https://fonts.googleapis.com">
-   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Ahom&display=swap" rel="stylesheet">
-   <script src="https://kit.fontawesome.com/48174618d9.js" crossorigin="anonymous"></script>
-   <script src="js/perfilUser.js" type="module"></script>
-   <title>Perfil</title>
-   <link rel="stylesheet" href="estilos/perfilestilos.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Ahom&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/48174618d9.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="estilos/principalestilos.css">
+    <script src="js/inicio.js" type="module"></script>
 </head>
-<body>
-         <!-- Encabezado -->
-         <div class="header" id="mainHeader">
-          <div class="menu" style="padding-left: 70px;" id="menuButton"><i class="fa-solid fa-bars fa-xl" style="color: #000000;"></i></div>
-          <div class="title-container">
-              <p class="titulo" style="padding-right: 75px;">COOK&RATE</p>
-              <p class="subtitulo" style="padding-right: 80px;">ANYONE CAN COOK</p>
-          </div>
-          <a class="avatar" href="perfil.html">
-
-              <p id="userName"></p>
-          </a>
-      </div>
-      <!-- Menu que aparece -->
-      <div class="menu-window" id="menuWindow">
-          <span class="close-menu" id="closeMenu">&times;</span>
-          <a href="perfil.html">Mi perfil</a>
-          <a href="paginaprin.html">Página de Inicio</a>
-      </div>
-
-<br><br><br><br><br><br><br><br><br><br><br><br>
-   <div class="profile-page">
-     <div class="cover-photo">
-       <img src="images/fondo.jpeg" alt="Foto de portada">
-       <div class="profile-photo">
-         <img src="images/cocinero.png" alt="Foto de perfil">
-       </div>
-     </div>
-     
-     <div class="profile-details">
-       <h2></h2>
-       <p></p>
-       <p></p>
-     </div>
-     
-
-     <div class="profile-edit">
-       <!-- Contenedor para los botones de editar perfil y cerrar sesión -->
-       <div class="button-container">
-         <button id="edit-profile" style=" font-family: Noto Serif Ahom serif;" >Edit Profile &nbsp;<i class="fa-regular fa-pen-to-square" style="color: #ffffff;"></i></button>
-         <button id="logout" style=" font-family: Noto Serif Ahom serif;"  >Log out&nbsp; <i class="fa-solid fa-right-from-bracket" style="color: #ffffff;"></i></button>
-       </div>
-       
-       
-       
-       <!-- Add this button near your other navigation elements -->
-<button id="create-recipe-btn" style=" font-family: Noto Serif Ahom serif;">Crear Receta&nbsp; <i class="fa-solid fa-plus" style="color: white;"></i></button>
-
-<br><br>
-<!-- Botón de desactivar cuenta -->
-<button id="deactivate-account" class="deactivate-btn" style=" font-family: Noto Serif Ahom serif;"  ><i class="fa-solid fa-user" style="color: #ffffff;"></i>&nbsp;Deactivate Account</button>
-
-<!-- Recipe Creation Modal -->
-<div id="recipe-modal" class="modal2">
-    <div class="modal-content2">
-        <span class="close-recipe-modal">&times;</span>
-        <h2>Crear Nueva Receta</h2>
-        <form id="recipe-form">
-            <input type="text" id="recipe-title" placeholder="Título de la receta" required>
-            
-            <div id="ingredients-container">
-                <!-- Dynamic ingredient inputs will be added here -->
+    <body>
+        <!-- Encabezado -->
+        <div class="header" id="mainHeader">
+            <div class="menu" style="padding-left: 70px;" id="menuButton"><i class="fa-solid fa-bars fa-xl" style="color: #000000;"></i></div>
+            <div class="title-container">
+                <p class="titulo">COOK&RATE</p>
+                <p class="subtitulo">CUALQUIERA PUEDE COCINAR</p>
             </div>
-            <button type="button" id="add-ingredient-btn">Agregar Ingrediente</button>
-            
-            <textarea id="recipe-steps" placeholder="Pasos de elaboración (uno por línea)" required></textarea>
-            
-            <input type="file" id="recipe-images" multiple accept="image/*">
-            <div id="image-preview-container"></div>
-            
-            <button type="submit">Publicar Receta</button>
-        </form>
-    </div>
-</div>
+            <a class="avatar" href="perfil.html">
+                <img  alt="Avatar" id="userIcon">
+                <p id="userName"></p>
+            </a>
+        </div>
+        <!-- Menu que aparece -->
+        <div class="menu-window" id="menuWindow">
+            <span class="close-menu" id="closeMenu">&times;</span>
+            <a href="topRestaurantes.html">The World's 5 Best</a>
+            <a href="perfil.html">Mi perfil</a>
+            <a href="paginaprin.html">Página de Inicio</a>
+        </div>
 
+        <!-- Contenido -->
+        <!-- <div class="content"><br></div> -->
+        <!-- Ranking de chefs -->
+        <div class="ranking"><p style="margin-top: 200px;">RANKING DE MEJORES CHEFS</p></div>
+        <div class="chefs">
+            <div class="chef-card">
+                <div class="chef-carousel">
+                    <div class="chef-carousel-images">
+                        <img src="../images/robebb.webp" alt="Chef 1">
+                    </div>
+                </div>
+                <div class="chef-text-below">ROBEGRILL</div>
+            </div>
+            
+            <div class="chef-card">
+                <div class="chef-carousel">  
+                    <div class="chef-carousel-images">
+                        <img src="../images/elenafinal.jpg" alt="Chef 8">
+                    </div>
+                </div>
+                <div class="chef-text-below">ELENA REYGADAS</div>
+            </div>
+            
+            <div class="chef-card">
+                <div class="chef-carousel">
+                    <div class="chef-carousel-images">
+                        <img src="../images/EnriqueOlvera.webp" alt="Chef 4">
+                    </div>
+                </div>
+                <div class="chef-text-below">ENRIQUE OLVERA</div>
+            </div>
+        </div>
+        <!-- PUBLICIDAD  -->
+        <div class="publicidad-container"></div>
+        <!-- RECETAS -->
+        <div class="tab-content publicaciones active"></div>
 
-
-       <!-- Modal -->
-       <div id="edit-modal" class="modal">
-         <div class="modal-content">
-           <span class="close-modal">&times;</span>
-           <h2>Editar Perfil</h2>
-           <form id="edit-form" method="POST" enctype="multipart/form-data" style="display:block;">
-             <label for="nombre">Nombre:</label>
-             <input type="text" id="nombre" name="nombre" value="Cesar">
-             
-             <label for="apellidoP">Apellido Paterno:</label>
-             <input type="text" id="apellidoP" name="apellidoP" value="Reyes">
-             
-             <label for="apellidoM">Apellido Materno:</label>
-             <input type="text" id="apellidoM" name="apellidoM" value="Barrientos">
-             
-             <label for="email">Email:</label>
-             <input type="email" id="email" name="email" value="cesar.correo.pruebas09@gmail.com">
-             
-             <label for="telefono">Teléfono:</label>
-             <input type="text" id="telefono" name="telefono" value="+524491234567">
-             
-             <label for="biografia">Biografía:</label>
-             <textarea id="biografia" name="biografia">Tonto y bobo.</textarea>
-             
-             <label for="imagen">Cambiar Imagen de Perfil:</label>
-             <input type="file" id="imagen" name="imagen" accept="image/*">
-             <img id="preview-imagen" style="max-width: 100px; display: none;" alt="Vista previa de la imagen">
-             
-             <button type="submit">Guardar Cambios</button>
-           </form>
-         </div>
-       </div>
-     </div>
-     
-     <div class="tabs">
-       <div class="tab active" data-target="publicaciones">Publications</div>
-       <div class="tab" data-target="gallery">Photo gallery</div>
-     </div>
-     
-     <div class="tab-content publicaciones active">
-       <!-- Aquí se generarán dinámicamente las publicaciones -->
-     </div>
-     
-     <div class="tab-content gallery">
-       <div class="photo-grid">
-         <img src="images/lasagna.jpg" alt="Foto 1">
-         <img src="images/bechamel.webp" alt="Foto 2">
-         <img src="images/pasta.jpg" alt="Foto 3">
-         <img src="images/joqueis.jpeg" alt="Foto 4">
-       </div>
-     </div>
-   </div>
-</body>
+        <!-- Corazon off -->
+        <i class="fa-regular fa-heart" style="color: #000000;"></i> 
+        <!-- Corazon on -->
+        <i class="fa-solid fa-heart" style="color: #ff0000;"></i>
+        <!-- Like off -->
+        <i class="fa-regular fa-thumbs-up" style="color: #000000;"></i>
+        <!-- Like on -->
+        <i class="fa-solid fa-thumbs-up" style="color: #11306f;"></i>
+        <!-- Dislike off -->
+        <i class="fa-regular fa-thumbs-down" style="color: #000000;"></i>
+        <!-- Dislike on -->
+        <i class="fa-solid fa-thumbs-down" style="color: #11306f;"></i>
+        
+    </body>
 </html>
