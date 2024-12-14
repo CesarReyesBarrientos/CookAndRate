@@ -367,7 +367,9 @@ i{
     border-radius: 5px;
 }
 .rating[type="number"] {
+    appearance: textfield;
     -moz-appearance: textfield;
+    -webkit-appearance: none;
 }
 .rating::-webkit-outer-spin-button,
 .rating::-webkit-inner-spin-button {
