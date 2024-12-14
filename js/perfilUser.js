@@ -108,6 +108,7 @@ document.getElementById('edit-form').addEventListener('submit', async (event) =>
   formData.append('email', email);
   formData.append('telefono', document.getElementById('telefono').value);
   formData.append('biografia', document.getElementById('biografia').value);
+  console.log(email);
 
   const imagenInput = document.getElementById('imagen');
   if (imagenInput.files[0]) {

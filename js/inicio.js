@@ -415,6 +415,8 @@ function generarPublicacionesCombinadas(publications) {
                         ${receta.Pasos_Elaboracion.map((paso, i) => `&nbsp;&nbsp;${i + 1}. ${paso}<br>`).join('')}
                     </div>
                 </div>
+                <a class="Id_receta" id="${receta.ID_Receta}">Saber más sobre la receta...</a>
+
                 <div class="carousel">
                     <button class="btn left">&lt;</button>
                     <div class="carousel-images">
@@ -481,6 +483,20 @@ document.addEventListener('mouseout', (event) => {
         }
     }
 });
+
+document.addEventListener('click', (event) => {
+
+});
+
+document.addEventListener('click', (event) => {
+    // Verificar si el elemento que desencadenó el evento tiene la clase 'Id_receta'
+    if (event.target.classList.contains('Id_receta')) {
+        // Obtener el valor del atributo 'id' de la etiqueta <a>
+        const recetaId = event.target.id;
+        console.log('El ID de la receta es:', recetaId);
+    }
+});
+
 
 
 
