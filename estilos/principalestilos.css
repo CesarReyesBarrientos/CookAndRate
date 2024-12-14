@@ -338,3 +338,45 @@ img.imgPubli {
 p.contenido {
     padding: 0 10px;
 }
+.parent-div {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+.child-div {
+    width: 20%;
+    text-align: center;
+    padding: 10px;
+    padding-bottom: 0;
+    box-sizing: border-box;
+    align-items: baseline;
+}
+.last-child {
+    width: 46%;
+    display: flex;
+    text-align: center;
+    justify-content: right;
+    align-items: baseline;
+}
+.child-div p {
+    margin: 0; 
+}
+i{
+    margin: 5px;
+}
+.rating {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 17px;
+    border: 1px solid #464646;
+    border-radius: 5px;
+}
+
+  .rating::-webkit-outer-spin-button,
+  .rating::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  /* <p>Calificar</p> 
+  <input class="rating" type="number" min="0" max="5" value="0">*/

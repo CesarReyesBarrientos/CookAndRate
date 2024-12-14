@@ -430,6 +430,21 @@ function generarPublicacionesCombinadas(publications) {
                     </div>
                     <button class="btn right">&gt;</button>
                 </div>
+                <div class="parent-div">
+                    <div class="child-div">
+                        <i class="fa-regular fa-heart fa-xl" style="color: #000000;"></i><p>Me encanta</p>
+                    </div>
+                    <div class="child-div">
+                        <i class="fa-regular fa-thumbs-up fa-xl" style="color: #000000;"></i><p>Me gusta</p>
+                    </div>
+                    <div class="child-div">
+                        <i class="fa-regular fa-thumbs-down fa-xl" style="color: #000000;"></i><p>No me gusta</p>
+                    </div>
+                    <div class="child-div last-child" >
+                        <input class="rating" type="number" min="0" max="5" value="0">
+                        <i class="fas fa-star fa-lg" ></i><p>Calificar</p>
+                    </div>
+                </div>
             `;
         }
 
