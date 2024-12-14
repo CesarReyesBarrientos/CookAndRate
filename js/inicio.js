@@ -462,27 +462,27 @@ function generarPublicacionesCombinadas(publications) {
 
 document.addEventListener('DOMContentLoaded', fetchCombinedPublications);
 
-document.addEventListener('mouseover', (event) => {
-    if (event.target.classList.contains('icon-off')) {
-        const iconOff = event.target;
-        const iconOn = iconOff.nextElementSibling;
-        if (iconOn) {
-            iconOff.style.display = 'none';
-            iconOn.style.display = 'inline-block';
-        }
-    }
-});
+// document.addEventListener('mouseover', (event) => {
+//     if (event.target.classList.contains('icon-off')) {
+//         const iconOff = event.target;
+//         const iconOn = iconOff.nextElementSibling;
+//         if (iconOn) {
+//             iconOff.style.display = 'none';
+//             iconOn.style.display = 'inline-block';
+//         }
+//     }
+// });
 
-document.addEventListener('mouseout', (event) => {
-    if (event.target.classList.contains('icon-on')) {
-        const iconOn = event.target;
-        const iconOff = iconOn.previousElementSibling;
-        if (iconOff) {
-            iconOff.style.display = 'inline-block';
-            iconOn.style.display = 'none';
-        }
-    }
-});
+// document.addEventListener('mouseout', (event) => {
+//     if (event.target.classList.contains('icon-on')) {
+//         const iconOn = event.target;
+//         const iconOff = iconOn.previousElementSibling;
+//         if (iconOff) {
+//             iconOff.style.display = 'inline-block';
+//             iconOn.style.display = 'none';
+//         }
+//     }
+// });
 
 document.addEventListener('click', (event) => {
 
@@ -497,16 +497,28 @@ document.addEventListener('click', (event) => {
     if (event.target.classList.contains('Id_User')) {
         const userid = event.target.id;
         console.log('El ID del usuario:', userid);
-        // window.open(`/pagina-usuario?id=${userid}`, '_blank');
+        window.open(`pagina-usuario.html?id=${userid}`, '_blank');
     }
     if (event.target.classList.contains('interact')) {
         const interactID = event.target.id;
         console.log('El ID de la interaccion es: ', interactID);
+        if (event.target.classList.contains('icon-off')) {
+            const iconOff = event.target;
+            const iconOn = iconOff.nextElementSibling;
+            if (iconOn) {
+                iconOff.style.display = 'none';
+                iconOn.style.display = 'inline-block';
+            }
+        }
+        if (event.target.classList.contains('icon-on')) {
+            const iconOn = event.target;
+            const iconOff = iconOn.previousElementSibling;
+            if (iconOff) {
+                iconOff.style.display = 'inline-block';
+                iconOn.style.display = 'none';
+            }
+        }
     }
-});
-
-document.addEventListener('click', (event) => {
-    
 });
 
 
