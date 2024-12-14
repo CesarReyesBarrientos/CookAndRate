@@ -489,13 +489,13 @@ document.addEventListener('click', (event) => {
 });
 
 document.addEventListener('click', (event) => {
-    // Verificar si el elemento que desencadenó el evento tiene la clase 'Id_receta'
     if (event.target.classList.contains('Id_receta')) {
-        // Obtener el valor del atributo 'id' de la etiqueta <a>
         const recetaId = event.target.id;
         console.log('El ID de la receta es:', recetaId);
+        window.location.href = `/pagina-receta?id=${recetaId}`;
     }
 });
+
 
 
 

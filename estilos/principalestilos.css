@@ -250,7 +250,7 @@ a.avatar:active {
     text-decoration: none;
     outline: none;
 }
-a:hover {
+a.avatar:hover {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Sombra al pasar el cursor */
 }
 .avatar img {
@@ -375,4 +375,14 @@ i{
 .rating::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+a.Id_receta {
+    /* border: 1px solid purple; */
+    font-size: 13px;
+    color: blue;
+    padding-left: 5px;
+}
+a.Id_receta:hover{
+    text-decoration: underline;
+    cursor: pointer;
 }
