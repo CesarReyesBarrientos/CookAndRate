@@ -12,17 +12,37 @@
    <link rel="stylesheet" href="estilos/perfilestilos.css">
 </head>
 <body>
+         <!-- Encabezado -->
+         <div class="header" id="mainHeader">
+          <div class="menu" style="padding-left: 70px;" id="menuButton"><i class="fa-solid fa-bars fa-xl" style="color: #000000;"></i></div>
+          <div class="title-container">
+              <p class="titulo" style="padding-right: 75px;">COOK&RATE</p>
+              <p class="subtitulo" style="padding-right: 80px;">ANYONE CAN COOK</p>
+          </div>
+          <a class="avatar" href="perfil.html">
+
+              <p id="userName"></p>
+          </a>
+      </div>
+      <!-- Menu que aparece -->
+      <div class="menu-window" id="menuWindow">
+          <span class="close-menu" id="closeMenu">&times;</span>
+          <a href="perfil.html">Mi perfil</a>
+          <a href="paginaprin.html">Página de Inicio</a>
+      </div>
+
+<br><br><br><br><br><br><br><br><br><br><br><br>
    <div class="profile-page">
      <div class="cover-photo">
        <img src="images/fondo.jpeg" alt="Foto de portada">
        <div class="profile-photo">
-         <img src="" alt="Foto de perfil">
+         <img src="images/cocinero.png" alt="Foto de perfil">
        </div>
      </div>
      
      <div class="profile-details">
        <h2></h2>
-       <p>1,234 seguidores</p>
+       <p></p>
        <p></p>
      </div>
      
@@ -30,13 +50,44 @@
      <div class="profile-edit">
        <!-- Contenedor para los botones de editar perfil y cerrar sesión -->
        <div class="button-container">
-         <button id="edit-profile">Editar Perfil</button>
-         <button id="logout">Cerrar Sesión</button>
+         <button id="edit-profile" style=" font-family: Noto Serif Ahom serif;" >Edit Profile &nbsp;<i class="fa-regular fa-pen-to-square" style="color: #ffffff;"></i></button>
+         <button id="logout" style=" font-family: Noto Serif Ahom serif;"  >Log out&nbsp; <i class="fa-solid fa-right-from-bracket" style="color: #ffffff;"></i></button>
        </div>
        
-       <!-- Botón de desactivar cuenta -->
-       <button id="deactivate-account" class="deactivate-btn">Desactivar Cuenta</button>
        
+       
+       <!-- Add this button near your other navigation elements -->
+<button id="create-recipe-btn" style=" font-family: Noto Serif Ahom serif;">Crear Receta&nbsp; <i class="fa-solid fa-plus" style="color: white;"></i></button>
+
+<br><br>
+<!-- Botón de desactivar cuenta -->
+<button id="deactivate-account" class="deactivate-btn" style=" font-family: Noto Serif Ahom serif;"  ><i class="fa-solid fa-user" style="color: #ffffff;"></i>&nbsp;Deactivate Account</button>
+
+<!-- Recipe Creation Modal -->
+<div id="recipe-modal" class="modal2">
+    <div class="modal-content2">
+        <span class="close-recipe-modal">&times;</span>
+        <h2>Crear Nueva Receta</h2>
+        <form id="recipe-form">
+            <input type="text" id="recipe-title" placeholder="Título de la receta" required>
+            
+            <div id="ingredients-container">
+                <!-- Dynamic ingredient inputs will be added here -->
+            </div>
+            <button type="button" id="add-ingredient-btn">Agregar Ingrediente</button>
+            
+            <textarea id="recipe-steps" placeholder="Pasos de elaboración (uno por línea)" required></textarea>
+            
+            <input type="file" id="recipe-images" multiple accept="image/*">
+            <div id="image-preview-container"></div>
+            
+            <button type="submit">Publicar Receta</button>
+        </form>
+    </div>
+</div>
+
+
+
        <!-- Modal -->
        <div id="edit-modal" class="modal">
          <div class="modal-content">
@@ -72,8 +123,8 @@
      </div>
      
      <div class="tabs">
-       <div class="tab active" data-target="publicaciones">Publicaciones</div>
-       <div class="tab" data-target="gallery">Galería de fotos</div>
+       <div class="tab active" data-target="publicaciones">Publications</div>
+       <div class="tab" data-target="gallery">Photo gallery</div>
      </div>
      
      <div class="tab-content publicaciones active">
