@@ -207,24 +207,19 @@ function updateUserInterface() {
     // Función para actualizar la interfaz con los datos cargados
     if (userResult) {
         // Ejemplo: actualizar nombre de usuario
-        document.getElementById('userName').textContent = userResult.Nombre + " " + userResult.ApellidoP + " " + userResult.ApellidoM;
+        const userNameElement = document.getElementById('userName');
+        if (userNameElement) {
+            userNameElement.textContent = userResult.Nombre + " " + userResult.ApellidoP + " " + userResult.ApellidoM;
+        }
         
         // Ejemplo: actualizar imagen de perfil
         if (userResult.imagen) {
             const userImage = `http://25.61.139.76:3000${userResult.imagen}`;
-            document.getElementById('userIcon').src = userImage;
-            // console.log(foodRResult.Seguidos);
+            const userIconElement = document.getElementById('userIcon');
+            if (userIconElement) {
+                userIconElement.src = userImage;
+            }
         }
-    }
-
-    if (recetasChefResult) {
-        // Lógica para mostrar recetas del chef
-        const recetasContainer = document.getElementById('recetasContainer');
-        recetasChefResult.forEach(receta => {
-            const recetaElement = document.createElement('div');
-            recetaElement.textContent = receta.nombre;
-            recetasContainer.appendChild(recetaElement);
-        });
     }
 }
   
