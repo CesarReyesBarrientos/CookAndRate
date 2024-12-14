@@ -6,3 +6,111 @@
 .interlineado{
     line-height: 1.5;
 }
+.header {
+    background-color: #FFFFFF;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* padding: 10px 50px; */
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: none;
+    padding: 20px;
+    transition: box-shadow 0.3s ease-in-out;
+}
+.header.scrolled {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.menu {
+    order: -1;
+    font-size: 20px;
+    color: blue;
+    cursor: pointer;
+}
+.title-container {
+    text-align: center;
+    flex-grow: 1;
+}
+.titulo {
+    font-size: 60px;
+    margin: 0; 
+    font-family: "Noto Serif Ahom", serif;
+}
+.subtitulo {
+    font-size: 20px;
+    margin: 0; 
+    color: gray; 
+    font-family: "Noto Serif Ahom", serif;
+}
+.avatar {
+    /* Añadido para asegurar que la imagen esté a la derecha */
+    display: flex;
+    align-items: center;
+    margin-right: 70px;
+    flex-direction: column;
+    text-decoration: none;
+    transition: text-shadow 0.3s ease;
+}
+a.avatar:focus, 
+a.avatar:active {
+    text-decoration: none;
+    outline: none;
+}
+a:hover {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Sombra al pasar el cursor */
+}
+.avatar img {
+    height: 80px;
+    width: 80px; /* Añadido para evitar problemas de dimensionamiento */
+    max-width: 80px;
+    border-radius: 50%;
+    /* border: 1px solid green; */
+    object-fit: cover; /* Asegura que la imagen se ajuste correctamente */
+}
+p#userName {
+    /* border: 1px solid green; */
+    margin: 0;
+    text-decoration: none;
+    color: black;
+    font-family: "Noto Serif Ahom", serif;
+    font-weight: bolder;
+    letter-spacing: 2px;
+}
+.menu-window {
+    position: fixed;
+    top: -50%;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: top 0.3s ease-in-out;
+    z-index: 2000;
+}
+.menu-window.open {
+    top: 0;
+}
+.menu-window a {
+    font-size: 20px;
+    margin: 10px 0;
+    text-decoration: none;
+    color: black;
+    font-family: "Noto Serif Ahom", serif;
+}
+.menu-window a:hover {
+    text-decoration: underline;
+}
+.close-menu {
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    font-size: 30px;
+    cursor: pointer;
+    color: black;
+}

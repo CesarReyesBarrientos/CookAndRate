@@ -6,6 +6,8 @@
     <title>Mejores Restaurantes</title>
     <link rel="stylesheet" href="estilos/estilosRestaurantes.css">
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Ahom&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/48174618d9.js" crossorigin="anonymous"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
     <style>
         body {
@@ -22,6 +24,26 @@
     </style>
 </head>
 <body>
+        <!-- Encabezado -->
+        <div class="header" id="mainHeader">
+            <div class="menu" style="padding-left: 70px;" id="menuButton"><i class="fa-solid fa-bars fa-xl" style="color: #000000;"></i></div>
+            <div class="title-container">
+                <p class="titulo">COOK&RATE</p>
+                <p class="subtitulo">CUALQUIERA PUEDE COCINAR</p>
+            </div>
+            <a class="avatar" href="perfil.html">
+                <img  alt="Avatar" id="userIcon">
+                <p id="userName"></p>
+            </a>
+        </div>
+        <!-- Menu que aparece -->
+        <div class="menu-window" id="menuWindow">
+            <span class="close-menu" id="closeMenu">&times;</span>
+            <a href="topRestaurantes.html">The World's 5 Best</a>
+            <a href="perfil.html">Mi perfil</a>
+            <a href="paginaprin.html">Página de Inicio</a>
+        </div>
+
     <div class="conte">
     <h1>The World's 5 Best Restaurants</h1>
     <img src="./images/header.jpg" alt="">
@@ -86,95 +108,6 @@
         <p><strong>Location:</strong></p>
         <div id="map-5" class="map-container"></div>
     </div>
-    
-    <script>
-        fetch('http://25.61.139.76:3000/mapbox-token')
-            .then(response => response.json())
-            .then(data => {
-                mapboxgl.accessToken = data.token;
-    
-                // Información manual de los restaurantes
-                const restaurantData = {
-                    1: {
-                        name: "Disfrutar",
-                        image: "https://i0.wp.com/yummybarcelona.com/wp-content/uploads/2023/10/restaurant-disfrutar-barcelona-3.jpg?resize=900%2C675&ssl=1",
-                        hours: "Monday to Sunday: 1:00 PM - 3:00 PM, 8:00 PM - 10:00 PM",
-                        review: "An excellent gastronomic experience with innovative flavors."
-                    },
-                    2: {
-                        name: "Pujol",
-                        image: "https://images.squarespace-cdn.com/content/v1/62c0918972f37e3fad1564cb/14c3438e-2b08-45b2-8d37-1d6526290163/JSa_Pujol_LGM_0072+%28Header%29.jpg",
-                        hours: "Tuesday to Saturday: 1:00 PM - 10:30 PM",
-                        review: "A tribute to traditional and contemporary Mexican cuisine."
-                    },
-                    3: {
-                        name: "Table by Bruno Verjus",
-                        image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhm0kl5FUB449IqCvGDblxMZtpmCYYKYlGQJ6FbqP2UnvqdMqNgkrdErO5o0B_8SeuNQPd-r-r-zeQAXyJd1fXKhGG1d7LHtqMPb8L0PzjWzFPBCngDq0ib2GZa0Sfy-BtneFsEDdH0yek/s1600/table+restaurant+bruno+verjus+paris+75012+exterior.jpg",
-                        hours: "Tuesday to Saturday: 12:00 PM - 2:30 PM, 7:00 PM - 10:00 PM",
-                        review: "A cozy spot with an artistic culinary proposal."
-                    },
-                    4: {
-                        name: "Atomix",
-                        image: "https://images.squarespace-cdn.com/content/v1/5ac3bec4aa49a18caab02bf4/1648580412075-5P22YY93JUD4GPIHSG5Y/220202_Atomix_8184.jpg?format=2500w",
-                        hours: "Wednesday to Sunday: 6:00 PM - 11:00 PM",
-                        review: "A fusion of modern Korean cuisine with a sophisticated ambiance."
-                    },
-                    5: {
-                        name: "Gaggan",
-                        image: "https://gaggan.com/wp-content/uploads/2023/07/img_-gaggan-gg-2.png",
-                        hours: "Tuesday to Sunday: 6:00 PM - 11:00 PM",
-                        review: "Creativity in every dish with flavors from Southeast Asia."
-                    }
-
-                };
-    
-                // Función para inicializar un mapa
-                function initMap(containerId, restaurantId) {
-                    // Obtener los datos del restaurante manualmente
-                    const restaurant = restaurantData[restaurantId];
-    
-                    // Coordenadas simuladas (modificar con datos reales si se tienen)
-                    const coordinates = {
-                        1: { lng: 2.15899, lat: 41.3825 },  // Disfrutar, Barcelona
-                        2: { lng: -99.1677, lat: 19.4326 }, // Pujol, Mexico City
-                        3: { lng: 2.3522, lat: 48.8566 },   // Paris
-                        4: { lng: -73.9851, lat: 40.758 },  // New York
-                        5: { lng: 100.5018, lat: 13.7563 }  // Bangkok
-                    };
-    
-                    const { lng, lat } = coordinates[restaurantId];
-    
-                    // Crear el mapa
-                    const map = new mapboxgl.Map({
-                        container: containerId,
-                        style: 'mapbox://styles/mapbox/streets-v11',
-                        center: [lng, lat],
-                        zoom: 18
-                    });
-    
-                    // Agregar marcador con ventana emergente personalizada
-                    new mapboxgl.Marker()
-                        .setLngLat([lng, lat])
-                        .setPopup(new mapboxgl.Popup().setHTML(`
-                            <div style="text-align: center;">
-                                <h3>${restaurant.name}</h3>
-                                <img src="${restaurant.image}" alt="${restaurant.name}" style="width: 100%; max-width: 300px; height: auto; border-radius: 10px; margin: 10px 0;">
-                                <p><strong>Horarios:</strong> ${restaurant.hours}</p>
-                                <p><strong>Reseña:</strong> ${restaurant.review}</p>
-                            </div>
-                        `))
-                        .addTo(map);
-                }
-    
-                // Inicializar mapas para cada restaurante
-                initMap('map-1', 1);
-                initMap('map-2', 2);
-                initMap('map-3', 3);
-                initMap('map-4', 4);
-                initMap('map-5', 5);
-            })
-            .catch(error => console.error('Error obteniendo el token:', error));
-    </script>
-    
+    <script src="js/topRest.js"></script>
 </body>
 </html>

@@ -7,20 +7,6 @@ let chefResult;
 let recetasChefResult; 
 let foodRResult;
 
-// async function fetchAnuncios() {
-//     try {
-//         // Carga el archivo anuncios.txt
-//         const response = await fetch('http://25.61.139.76:3000/read-anuncios');
-//         const data = await response.json();
-//         const anuncios = data.anuncios;
-
-//         // Genera los anuncios dinámicamente
-//         generarAnuncios(anuncios);
-//     } catch (error) {
-//         console.error('Error al cargar los anuncios:', error);
-//     }
-// }
-
 function generarAnuncios(anuncios) {
     const container = document.querySelector('.publicidad-container');
     container.innerHTML = '';

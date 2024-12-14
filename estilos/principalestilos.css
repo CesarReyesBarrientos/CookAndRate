@@ -368,8 +368,8 @@ i{
 }
 .rating[type="number"] {
     appearance: textfield;
-    -moz-appearance: textfield;
     -webkit-appearance: none;
+    -moz-appearance: textfield;
 }
 .rating::-webkit-outer-spin-button,
 .rating::-webkit-inner-spin-button {
