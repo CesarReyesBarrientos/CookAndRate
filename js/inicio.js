@@ -138,7 +138,7 @@ const getRecetas = async () => {
         const response = await fetch('http://25.61.139.76:3000/read-recetas');
         if (response.ok) {
             const data = await response.json();
-            console.log(data);
+            //console.log(data);
         } else {
             console.error('Error en la respuesta:', response.statusText);
         }
@@ -172,7 +172,7 @@ const getChefData = async (userId) => {
 
         if (response.avaible === "1") {
             const data = await response.json();  // Convertimos la respuesta a JSON
-            console.log("INFORMACION CHEFS SEGUIDOS:"+data);
+            //console.log("INFORMACION CHEFS SEGUIDOS:"+data);
         } else {
             console.error('Error en la respuesta:', response.statusText);
         }
@@ -185,7 +185,7 @@ const getUserData = (token) => {
     return new Promise((resolve, reject) => {
         const userData = parseJWT(token);
         if (userData) {
-            console.log('Datos del usuario', userData.userId);
+            //console.log('Datos del usuario', userData.userId);
             const data = {};
             data.userId = userData.userId;
             fetch('http://25.61.139.76:3000/find-user-by-id', {

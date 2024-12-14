@@ -6,12 +6,14 @@ window.onload = () => {
       return;
   }
 
+  // Utilizando la función modificada
   getUserData(token).then(user => {
       if (user.Estado === 0) {
           alert('Tu cuenta está desactivada. Contacta al soporte si deseas reactivarla.');
           window.location.href = 'index.html';
       }
-  }).catch(error => {
+  })
+  .catch(error => {
       console.error('Error al verificar el estado del usuario:', error);
       alert('Hubo un problema al verificar tu cuenta.');
   });
@@ -30,44 +32,50 @@ const parseJWT = (token) => {
   }
 };
 
-// Obtiene datos del usuario logueado y actualiza el perfil
 const getUserData = (token) => {
-  const userData = parseJWT(token);
-  if (userData) {
-    const data = { userId: userData.userId };
-    fetch('http://25.61.139.76:3000/find-user-by-id', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        if (result.user) {
-          // Actualizar los datos del perfil en la vista
-          document.querySelector('.profile-details h2').textContent =
-            `${result.user.Nombre} ${result.user.ApellidoP} ${result.user.ApellidoM}`;
-          document.querySelector('.profile-details p:nth-of-type(2)').textContent =
-            result.user.Biografia || 'Sin descripción.';
-          document.querySelector('.profile-photo img').src = `http://25.61.139.76:3000${result.user.imagen}`;
+  return new Promise((resolve, reject) => {
+      const userData = parseJWT(token);
+      if (userData) {
+          const data = { userId: userData.userId };
+          fetch('http://25.61.139.76:3000/find-user-by-id', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data),
+          })
+          .then((response) => response.json())
+          .then((result) => {
+              if (result.user) {
+                  // Actualizar los datos del perfil en la vista
+                  document.querySelector('.profile-details h2').textContent =
+                      `${result.user.Nombre} ${result.user.ApellidoP} ${result.user.ApellidoM}`;
+                  document.querySelector('.profile-details p:nth-of-type(2)').textContent =
+                      result.user.Biografia || 'Sin descripción.';
+                  document.querySelector('.profile-photo img').src = `http://25.61.139.76:3000${result.user.imagen}`;
 
-          // Precargar los datos en el formulario
-          document.getElementById('nombre').value = result.user.Nombre;
-          document.getElementById('apellidoP').value = result.user.ApellidoP;
-          document.getElementById('apellidoM').value = result.user.ApellidoM;
-          document.getElementById('email').value = result.user.Email;
-          document.getElementById('email').setAttribute('data-original-email', result.user.Email);
-          document.getElementById('telefono').value = result.user.Telefono;
-          document.getElementById('biografia').value = result.user.Biografia;
-        } else {
-          console.error('No se encontró el usuario en los datos recibidos.');
-        }
-      })
-      .catch((error) => {
-        console.error('Error al obtener los datos del usuario:', error);
-      });
-  } else {
-    console.error('Token inválido.');
-  }
+                  // Precargar los datos en el formulario
+                  document.getElementById('nombre').value = result.user.Nombre;
+                  document.getElementById('apellidoP').value = result.user.ApellidoP;
+                  document.getElementById('apellidoM').value = result.user.ApellidoM;
+                  document.getElementById('email').value = result.user.Email;
+                  document.getElementById('email').setAttribute('data-original-email', result.user.Email);
+                  document.getElementById('telefono').value = result.user.Telefono;
+                  document.getElementById('biografia').value = result.user.Biografia;
+
+                  resolve(result.user);
+              } else {
+                  console.error('No se encontró el usuario en los datos recibidos.');
+                  reject(new Error('Usuario no encontrado'));
+              }
+          })
+          .catch((error) => {
+              console.error('Error al obtener los datos del usuario:', error);
+              reject(error);
+          });
+      } else {
+          console.error('Token inválido.');
+          reject(new Error('Token inválido'));
+      }
+  });
 };
 
 // Mostrar/ocultar formulario de edición
@@ -144,7 +152,7 @@ document.getElementById('edit-form').addEventListener('submit', async (event) =>
           document.querySelector('.profile-details p:nth-of-type(2)').textContent =
               updatedUser.Biografia || 'Sin descripción.';
           if (updatedUser.imagen) {
-              document.querySelector('.profile-photo img').src = `http://25.61.139.76:3000/img/${updatedUser.imagen}`;
+              document.querySelector('.profile-photo img').src = `http://25.61.139.76:3000/img/userIcons/${updatedUser.imagen}`;
           }
 
           // Actualizar el formulario con los nuevos valores
@@ -339,20 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.getElementById('logout').addEventListener('click', async () => {
-  const token = localStorage.getItem('authToken');
-  
-  try {
-      // Opción 1: Si necesitas hacer una solicitud al servidor para cerrar sesión
-      await fetch('http://25.61.139.76:3000/logout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token }),
-      });
-  } catch (error) {
-      console.error('Error cerrando sesión:', error);
-  }
-
-  // Opción 2: Eliminar el token directamente en el frontend
+  // Eliminar el token del localstorage
   localStorage.removeItem('authToken');
   alert('Sesión cerrada. Redirigiendo a la página de inicio...');
   window.location.href = 'index.html';
