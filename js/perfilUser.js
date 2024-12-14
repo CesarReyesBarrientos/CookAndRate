@@ -254,11 +254,11 @@ async function fetchRecetas() {
 function generarPublicaciones(recetas, chefs, users) {
   const publicacionesContainer = document.querySelector('.tab-content.publicaciones');
   publicacionesContainer.innerHTML = '';
-
   recetas.forEach((receta) => {
-    const chef = chefs.find((c) => c.Id_Chef === receta.Id_Chef);
+    console.log('Id_Chef de la receta:', receta.ID_Chef);
+    const chef = chefs.find((c) => c.ID_Chef === receta.ID_Chef);
     const user = chef ? users.find((u) => u.ID_User === chef.ID_User) : null;
-
+    //console.log(user);
     const chefImage = user
       ? `http://25.61.139.76:3000/img/userIcons/${user.imagen}?t=${Date.now()}`
       : 'http://25.61.139.76:3000/img/default.png?t=${Date.now()}';
