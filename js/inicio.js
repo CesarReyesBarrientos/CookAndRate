@@ -6,6 +6,7 @@ let userResult;
 let chefResult; 
 let recetasChefResult; 
 let foodRResult;
+let recetasPagina;
 
 function generarAnuncios(anuncios) {
     const container = document.querySelector('.publicidad-container');
@@ -298,6 +299,7 @@ async function fetchCombinedPublications() {
         const recetasResponse = await fetch('http://25.61.139.76:3000/read-recetas');
         const recetasData = await recetasResponse.json();
         const recetas = recetasData.recetas;
+        
 
         // Obtener chefs
         const chefsResponse = await fetch('http://25.61.139.76:3000/read-chefs');
@@ -340,6 +342,7 @@ async function fetchCombinedPublications() {
 
         // Generar publicaciones
         generarPublicacionesCombinadas(limitedPublications);
+        setUserInteracts();
     } catch (error) {
         console.error('Error al obtener los datos:', error);
     }
@@ -428,19 +431,19 @@ function generarPublicacionesCombinadas(publications) {
                     <div class="child-div">
                         <!-- Corazón -->
                         <i class="fa-regular fa-heart fa-xl icon-off interact" data-receta="${receta.ID_Receta}" id="int-01" style="color: #000000;"></i> 
-                        <i class="fa-solid fa-heart fa-xl icon-on icon-on interact" id="int-02" data-recete="${receta.ID_Receta}" style="color: #ff0000; display: none;"></i>
+                        <i class="fa-solid fa-heart fa-xl icon-on icon-on interact_" id="int-02" data-receta="${receta.ID_Receta}" style="color: #ff0000; display: none;"></i>
                         <p>Me encanta</p>
                     </div>
                     <div class="child-div">
                         <!-- Like -->
                         <i class="fa-regular fa-thumbs-up fa-xl icon-off interact" id="int-03" data-receta="${receta.ID_Receta}" style="color: #000000;"></i>
-                        <i class="fa-solid fa-thumbs-up fa-xl icon-on interact" id="int-04" data-receta="${receta.ID_Receta}" style="color: #11306f; display: none;"></i>
+                        <i class="fa-solid fa-thumbs-up fa-xl icon-on interact_" id="int-04" data-receta="${receta.ID_Receta}" style="color: #11306f; display: none;"></i>
                         <p>Me gusta</p>
                     </div>
                     <div class="child-div">
                         <!-- Dislike -->
                         <i class="fa-regular fa-thumbs-down fa-xl icon-off interact" id="int-05" data-receta="${receta.ID_Receta}" style="color: #000000;"></i>
-                        <i class="fa-solid fa-thumbs-down fa-xl icon-on interact" id="int-06" data-receta="${receta.ID_Receta}" style="color: #11306f; display: none;"></i>
+                        <i class="fa-solid fa-thumbs-down fa-xl icon-on interact_" id="int-06" data-receta="${receta.ID_Receta}" style="color: #11306f; display: none;"></i>
                         <p>No me gusta</p>
                     </div>
                     <div class="child-div last-child" >
@@ -462,31 +465,58 @@ function generarPublicacionesCombinadas(publications) {
 
 document.addEventListener('DOMContentLoaded', fetchCombinedPublications);
 
-// document.addEventListener('mouseover', (event) => {
-//     if (event.target.classList.contains('icon-off')) {
-//         const iconOff = event.target;
-//         const iconOn = iconOff.nextElementSibling;
-//         if (iconOn) {
-//             iconOff.style.display = 'none';
-//             iconOn.style.display = 'inline-block';
-//         }
-//     }
-// });
+async function setUserInteracts() {
+    try {
+        // Obtener las recetas desde el servidor
+        const recetasResponse = await fetch('http://25.61.139.76:3000/read-recetas');
+        const recetasData = await recetasResponse.json();
+        const recetas = recetasData.recetas;
+        recetasPagina = recetas;
 
-// document.addEventListener('mouseout', (event) => {
-//     if (event.target.classList.contains('icon-on')) {
-//         const iconOn = event.target;
-//         const iconOff = iconOn.previousElementSibling;
-//         if (iconOff) {
-//             iconOff.style.display = 'inline-block';
-//             iconOn.style.display = 'none';
-//         }
-//     }
-// });
+        // Filtrar las recetas que tienen interacciones del usuario logueado
+        const recetasFiltradas = recetas.filter(receta => 
+            receta.Interacciones.some(interaccion => interaccion.ID_User === userResult.ID_User)
+        );
+        //console.log(recetasFiltradas);
+        // Recorrer todas las recetas filtradas
+        recetasFiltradas.forEach(receta => {
+            // Recorrer las interacciones de cada receta
+            receta.Interacciones.forEach(interaccion => {
+                if (interaccion.ID_User === userResult.ID_User) {
+                    const recetaID = receta.ID_Receta;
+                    const tipoInteraccion = interaccion.Tipo_Interaccion;
+            
+                    // Mapear los tipos de interacción a los íconos
+                    const mapping = {
+                        'Me encanta': { off: 'int-01', on: 'int-02' },
+                        'Me gusta': { off: 'int-03', on: 'int-04' },
+                        'No me gusta': { off: 'int-05', on: 'int-06' }
+                    };
+            
+                    const interaccionIcons = mapping[tipoInteraccion];
+            
+                    if (interaccionIcons) {
+                        // Seleccionar los íconos específicos basados en data-receta
+                        const iconOff = document.querySelector(`i#${interaccionIcons.off}[data-receta="${recetaID}"]`);
+                        const iconOn = document.querySelector(`i#${interaccionIcons.on}[data-receta="${recetaID}"]`);
+            
+                        // Cambiar el estado de visibilidad de los íconos si existen
+                        if (iconOff && iconOn) {
+                            iconOff.style.display = 'none';
+                            iconOn.style.display = 'inline-block';
+                        }
+                    }
+                }
+            });
+        });
+    } catch (error) {
+        console.error('Error al actualizar las interacciones del usuario:', error);
+    }
+}
 
-document.addEventListener('click', (event) => {
 
-});
+
+
 
 document.addEventListener('click', (event) => {
     if (event.target.classList.contains('Id_receta')) {
@@ -499,34 +529,92 @@ document.addEventListener('click', (event) => {
         console.log('El ID del usuario:', userid);
         window.open(`pagina-usuario.html?id=${userid}`, '_blank');
     }
-    if (event.target.classList.contains('interact')) {
-        const interactID = event.target.id;
-        console.log('El ID de la interaccion es: ', interactID);
-        const receta = event.target.getAttribute('data-receta');
-        console.log('ID Receta:', receta);
 
-        
+    document.querySelectorAll('.interact').forEach(item => {
+        item.addEventListener('click', registrarInteraccion);
+    });
 
-        // Intercalar interacciones
-        if (event.target.classList.contains('icon-off')) {
-            const iconOff = event.target;
-            const iconOn = iconOff.nextElementSibling;
-            if (iconOn) {
-                iconOff.style.display = 'none';
-                iconOn.style.display = 'inline-block';
-            }
-        }
-        if (event.target.classList.contains('icon-on')) {
-            const iconOn = event.target;
-            const iconOff = iconOn.previousElementSibling;
-            if (iconOff) {
-                iconOff.style.display = 'inline-block';
-                iconOn.style.display = 'none';
-            }
-        }
-    }
 });
 
+
+function cambiarIconos(iconOff) {
+        let iconOn = iconOff.nextElementSibling;
+        if (!iconOn || iconOn.classList.contains('icon-off')) {
+            iconOn = iconOff.previousElementSibling;
+        }
+    
+        if (iconOn) {
+            // Si se activa "Me gusta" (int-03 o int-04)
+            if (iconOff.id === 'int-03' || iconOff.id === 'int-04') {
+                // Si "No me gusta" está activado (int-05 o int-06), desactivarlo
+                const dislikeIconOn = document.getElementById('int-06');
+                const dislikeIconOff = document.getElementById('int-05');
+                if (dislikeIconOn && dislikeIconOn.style.display === 'inline-block') {
+                    console.log("Se puso Me gusta y desactivó No me gusta");
+                    dislikeIconOff.style.display = 'inline-block'; // Se pone OFF el "No me gusta"
+                    dislikeIconOn.style.display = 'none';
+                }
+            }
+    
+            // Si se activa "No me gusta" (int-05 o int-06)
+            if (iconOff.id === 'int-05' || iconOff.id === 'int-06') {
+                // Si "Me gusta" está activado (int-03 o int-04), desactivarlo
+                const likeIconOn = document.getElementById('int-04');
+                const likeIconOff = document.getElementById('int-03');
+                if (likeIconOn && likeIconOn.style.display === 'inline-block') {
+                    console.log("Se puso No me gusta y desactivó Me gusta");
+                    likeIconOff.style.display = 'inline-block'; // Se pone OFF el "Me gusta"
+                    likeIconOn.style.display = 'none';
+                }
+            }
+    
+            // Mostrar el ícono ON y ocultar el OFF
+            iconOff.style.display = 'none'; // Se pone OFF el icono
+            iconOn.style.display = 'inline-block'; // Se pone ON el icono
+        }
+}
+
+function registrarInteraccion(event) {
+    if (event.target.classList.contains('interact')) {
+        const interactID = event.target.id;
+        const receta = event.target.getAttribute('data-receta');
+        const fechaInteraccion = new Date().toISOString();
+        const tiposInteraccion = {
+            'int-01': 'Me encanta',
+            'int-03': 'Me gusta',
+            'int-05': 'No me gusta'
+        };
+        const descripcionInteraccion = tiposInteraccion[interactID] || interactID;
+
+        const datos = {
+            tipoInteraccion: descripcionInteraccion,
+            idReceta: receta,
+            idUsuario: userResult.ID_User,
+            fechaInteraccion: fechaInteraccion
+        };
+
+        // Hacer la solicitud POST
+        fetch('http://25.61.139.76:3000/add-interaction', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datos)
+        })
+        .then(response => response.json())
+        .then(data => {
+            setUserInteracts(); // Actualiza la UI después de la respuesta
+        })
+        .catch(error => {
+            console.error('Error al agregar la interacción:', error);
+        });
+
+        // Después de registrar la interacción, cambia los iconos
+        if (event.target.classList.contains('icon-off')) {
+            cambiarIconos(event.target);
+        }
+    }
+}
 
 
 

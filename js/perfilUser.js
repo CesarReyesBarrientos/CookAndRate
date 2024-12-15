@@ -308,24 +308,6 @@ function generarPublicaciones(recetas, chefs, users) {
       <button class="btn right">&gt;</button>
     `;
     publicacion.appendChild(carousel);
-
-    // Comentarios
-    const comentarios = document.createElement('div');
-    comentarios.classList.add('comentarios');
-    comentarios.innerHTML = `
-      <textarea placeholder="Deja tu comentario..."></textarea>
-      <button>Comentar</button>
-    `;
-    publicacion.appendChild(comentarios);
-
-    // Lista de comentarios
-    const comentariosList = document.createElement('div');
-    comentariosList.classList.add('comentarios-list');
-    comentariosList.innerHTML = receta.Comentarios.map(
-      (c) => `<div class="comentario-item"><strong>${c.Usuario}:</strong> ${c.Comentario}</div>`
-    ).join('');
-    publicacion.appendChild(comentariosList);
-
     publicacionesContainer.appendChild(publicacion);
 
     setupCarousel(carousel);
