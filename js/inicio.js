@@ -446,10 +446,20 @@ function generarPublicacionesCombinadas(publications) {
                         <i class="fa-solid fa-thumbs-down fa-xl icon-on interact_" id="int-06" data-receta="${receta.ID_Receta}" style="color: #11306f; display: none;"></i>
                         <p>No me gusta</p>
                     </div>
-                    <div class="child-div last-child" >
-                        <input class="rating" type="number" min="0" max="5" value="0">
-                        <i class="fas fa-star fa-lg" ></i><p>Calificar</p>
-                    </div>
+
+                    ${chefResult ? '' : `
+                        <div class="child-div last-child" >
+                       <select class="rating">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        </select>
+
+                        <i data-receta="${receta.ID_Receta}" class="fas fa-star fa-lg enviar_" ></i><p>Calificar</p>
+                    </div>`}
                 </div>
             `;
             publicacionesContainer.appendChild(publicacion); // Añadir la receta al contenedor de publicaciones
@@ -514,10 +524,6 @@ async function setUserInteracts() {
     }
 }
 
-
-
-
-
 document.addEventListener('click', (event) => {
     if (event.target.classList.contains('Id_receta')) {
         const recetaId = event.target.id;
@@ -534,6 +540,15 @@ document.addEventListener('click', (event) => {
         item.addEventListener('click', registrarInteraccion);
     });
 
+    document.querySelectorAll('.enviar_').forEach(item => {
+        item.addEventListener('click', registrarCalificacion);
+    });
+
+    if (event.target.classList.contains('enviar_')) {
+        const ratingSelect = event.target.closest('.parent-div').querySelector('.rating');
+        const selectedRating = ratingSelect ? ratingSelect.value : null;
+        console.log(`Calificación seleccionada: ${selectedRating}`);
+    }
 });
 
 
@@ -616,7 +631,99 @@ function registrarInteraccion(event) {
     }
 }
 
+function actualizarUI() {
+    const ratingValue = document.querySelector('.rating').value;  // Obtener el valor de la calificación
+    const receta = document.querySelector('.rating').getAttribute('data-receta');  // Obtener la receta asociada
+
+    // Mostrar un mensaje de confirmación o actualización de la calificación
+    const mensajeConfirmacion = document.createElement('p');
+    mensajeConfirmacion.textContent = `¡Calificación de ${ratingValue} estrellas enviada correctamente!`;
+    document.body.appendChild(mensajeConfirmacion);
+
+    // Aquí puedes también actualizar el valor visual de la calificación en la UI (por ejemplo, mostrar el puntaje)
+    const recetaElemento = document.querySelector(`[data-receta="${receta}"]`);
+    if (recetaElemento) {
+        // Actualizar el icono o cualquier otro aspecto visual relacionado con la calificación
+        recetaElemento.classList.add('calificado');
+        // Si es necesario, actualizar el texto del puntaje
+        const puntuacionElemento = recetaElemento.querySelector('.puntuacion');
+        if (puntuacionElemento) {
+            puntuacionElemento.textContent = `Calificación: ${ratingValue} estrellas`;
+        }
+    }
+}
 
 
+function registrarCalificacion(event) {
+    if (event.target.classList.contains('enviar_')) {
+        const rating = document.querySelector('.rating').value; // Obtener la calificación seleccionada
+        const receta = event.target.getAttribute('data-receta');  // Obtener la receta asociada
+        console.log(rating);
+        const datos = {
+            idReceta: receta,
+            idUsuario: userResult.ID_User,
+            calificacion: (rating)  // Convertir a entero la calificación
+        };
 
+        // Hacer la solicitud POST para agregar la calificación
+        fetch('http://25.61.139.76:3000/add-rating', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datos)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Calificación agregada:', data); // Mostrar la respuesta
+            actualizarUI(); // Función para actualizar la UI (por ejemplo, mostrar la nueva calificación)
+        })
+        .catch(error => {
+            console.error('Error al agregar la calificación:', error);
+        });
+    }
+}
 
+const enviarIcon = document.querySelector('.enviar_');
+const ratingSelect = document.querySelector('.rating');
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('http://25.61.139.76:3000/top-3-recetas')
+        .then(response => response.json())
+        .then(data => {
+            const chefsContainer = document.querySelector('.chefs');
+            
+            // Limpiar el contenedor actual
+            chefsContainer.innerHTML = '';
+
+            // Modificar el título
+            const rankingDiv = document.querySelector('.ranking p');
+            rankingDiv.textContent = 'RANKING DE MEJORES PLATILLOS';
+            // Crear tarjetas para los mejores platillos
+            data.top3Recetas.forEach(receta => {
+                const chefCard = document.createElement('div');
+                chefCard.className = 'chef-card';
+                
+                chefCard.innerHTML = `
+                    <div class="chef-carousel">
+                        <div class="chef-carousel-images">
+                            <img src='http://25.61.139.76:3000/img/recetas/${receta.Imagen}' alt="${receta.Nombre}">
+                        </div>
+                    </div>
+                    <div class="chef-text-below">${receta.Nombre.toUpperCase()}</div>
+                `;
+                
+                chefsContainer.appendChild(chefCard);
+            });
+        })
+        .catch(error => {
+            console.error('Error al cargar los mejores platillos:', error);
+            
+            const chefsContainer = document.querySelector('.chefs');
+            chefsContainer.innerHTML = `
+                <div class="error-message">
+                    No se pudieron cargar los mejores platillos. Intente nuevamente más tarde.
+                </div>
+            `;
+        });
+});
