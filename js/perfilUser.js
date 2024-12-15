@@ -1,3 +1,11 @@
+const menuButton = document.getElementById("menuButton");
+const menuWindow = document.getElementById("menuWindow");
+const closeMenu = document.getElementById("closeMenu");
+let userResult;
+let chefResult; 
+let recetasChefResult; 
+let foodRResult;
+
 window.onload = () => {
   const token = localStorage.getItem('authToken');
   if (!token) {
@@ -11,7 +19,9 @@ window.onload = () => {
       if (user.Estado === 0) {
           alert('Tu cuenta está desactivada. Contacta al soporte si deseas reactivarla.');
           window.location.href = 'index.html';
+          //return;
       }
+      updateUserInterface();
   }).catch(error => {
       console.error('Error al verificar el estado del usuario:', error);
       alert('Hubo un problema al verificar tu cuenta.');
@@ -43,6 +53,7 @@ function getUserData(token) {
       .then((response) => response.json())
       .then((result) => {
         if (result.user) {
+          userResult = result.user;
           // Actualizar los datos del perfil en la vista
           document.querySelector('.profile-details h2').textContent =
             `${result.user.Nombre} ${result.user.ApellidoP} ${result.user.ApellidoM}`;
@@ -483,7 +494,25 @@ window.addEventListener("scroll", () => {
 }
 });
 
-
+function updateUserInterface() {
+  // Función para actualizar la interfaz con los datos cargados
+  if (userResult) {
+      // Ejemplo: actualizar nombre de usuario
+      const userNameElement = document.getElementById('userName');
+      if (userNameElement) {
+          userNameElement.textContent = userResult.Nombre + " " + userResult.ApellidoP + " " + userResult.ApellidoM;
+      }
+      
+      // Ejemplo: actualizar imagen de perfil
+      if (userResult.imagen) {
+          const userImage = `http://25.61.139.76:3000${userResult.imagen}`;
+          const userIconElement = document.getElementById('userIcon');
+          if (userIconElement) {
+              userIconElement.src = userImage;
+          }
+      }
+  }
+}
 
 //nueva funcion
 async function updateFollowersCount(userId) {

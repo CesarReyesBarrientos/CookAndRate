@@ -499,8 +499,16 @@ a.avatar:active {
   text-decoration: none;
   outline: none;
 }
-a:hover {
+a.avatar:hover {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Sombra al pasar el cursor */
+}
+.avatar img {
+  height: 80px;
+  width: 80px; /* Añadido para evitar problemas de dimensionamiento */
+  max-width: 80px;
+  border-radius: 50%;
+  /* border: 1px solid green; */
+  object-fit: cover; /* Asegura que la imagen se ajuste correctamente */
 }
 
 p#userName {

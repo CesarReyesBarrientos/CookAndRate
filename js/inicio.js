@@ -427,20 +427,20 @@ function generarPublicacionesCombinadas(publications) {
                 <div class="parent-div">
                     <div class="child-div">
                         <!-- Corazón -->
-                        <i class="fa-regular fa-heart fa-xl icon-off interact" id="int-01" style="color: #000000;"></i> 
-                        <i class="fa-solid fa-heart fa-xl icon-on icon-on interact" id="int-02" style="color: #ff0000; display: none;"></i>
+                        <i class="fa-regular fa-heart fa-xl icon-off interact" data-receta="${receta.ID_Receta}" id="int-01" style="color: #000000;"></i> 
+                        <i class="fa-solid fa-heart fa-xl icon-on icon-on interact" id="int-02" data-recete="${receta.ID_Receta}" style="color: #ff0000; display: none;"></i>
                         <p>Me encanta</p>
                     </div>
                     <div class="child-div">
                         <!-- Like -->
-                        <i class="fa-regular fa-thumbs-up fa-xl icon-off interact" id="int-03" style="color: #000000;"></i>
-                        <i class="fa-solid fa-thumbs-up fa-xl icon-on interact" id="int-04" style="color: #11306f; display: none;"></i>
+                        <i class="fa-regular fa-thumbs-up fa-xl icon-off interact" id="int-03" data-receta="${receta.ID_Receta}" style="color: #000000;"></i>
+                        <i class="fa-solid fa-thumbs-up fa-xl icon-on interact" id="int-04" data-receta="${receta.ID_Receta}" style="color: #11306f; display: none;"></i>
                         <p>Me gusta</p>
                     </div>
                     <div class="child-div">
                         <!-- Dislike -->
-                        <i class="fa-regular fa-thumbs-down fa-xl icon-off interact" id="int-05" style="color: #000000;"></i>
-                        <i class="fa-solid fa-thumbs-down fa-xl icon-on interact" id="int-06" style="color: #11306f; display: none;"></i>
+                        <i class="fa-regular fa-thumbs-down fa-xl icon-off interact" id="int-05" data-receta="${receta.ID_Receta}" style="color: #000000;"></i>
+                        <i class="fa-solid fa-thumbs-down fa-xl icon-on interact" id="int-06" data-receta="${receta.ID_Receta}" style="color: #11306f; display: none;"></i>
                         <p>No me gusta</p>
                     </div>
                     <div class="child-div last-child" >
@@ -502,6 +502,12 @@ document.addEventListener('click', (event) => {
     if (event.target.classList.contains('interact')) {
         const interactID = event.target.id;
         console.log('El ID de la interaccion es: ', interactID);
+        const receta = event.target.getAttribute('data-receta');
+        console.log('ID Receta:', receta);
+
+        
+
+        // Intercalar interacciones
         if (event.target.classList.contains('icon-off')) {
             const iconOff = event.target;
             const iconOn = iconOff.nextElementSibling;
