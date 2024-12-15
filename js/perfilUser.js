@@ -182,9 +182,7 @@ document.getElementById('edit-form').addEventListener('submit', async (event) =>
   }
 });
 
-
 document.addEventListener('DOMContentLoaded', fetchRecetas);
-
 
 // Nuevo código para manejar pestañas
 document.addEventListener('DOMContentLoaded', () => {

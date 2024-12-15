@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Ahom&display=swap" rel="stylesheet">
+   <script src="https://kit.fontawesome.com/48174618d9.js" crossorigin="anonymous"></script>
+   <link rel="icon" type="image/jpeg" href="images/12.jpg">
+   <script src="js/pagina-usuarios.js" type="module"></script>
+   <title>User Profile</title>
+   <link rel="stylesheet" href="estilos/perfilestilos.css">
+</head>
+<body>
+    <!-- Encabezado -->
+    <div class="header" id="mainHeader">
+        <div class="menu" style="padding-left: 70px;" id="menuButton"><i class="fa-solid fa-bars fa-xl" style="color: #000000;"></i></div>
+        <div class="title-container">
+            <p class="titulo" style="padding-right: 75px;">COOK&RATE</p>
+            <p class="subtitulo" style="padding-right: 80px;">ANYONE CAN COOK</p>
+        </div>
+        <a class="avatar" href="perfil.html">
+            <img  alt="Avatar" id="userIcon">
+            <p id="userName"></p>
+        </a>
+    </div>
+
+    <!-- Menu que aparece -->
+    <div class="menu-window" id="menuWindow">
+        <span class="close-menu" id="closeMenu">&times;</span>
+        <a href="topRestaurantes.html">The World's 5 Best</a>
+        <a href="perfil.html">Mi perfil</a>
+        <a href="paginaprin.html">Página de Inicio</a>
+    </div>
+
+    <br><br><br><br><br><br><br><br><br><br><br><br>
+
+    <div class="profile-page">
+        <div class="cover-photo">
+            <img src="images/fondo.jpeg" alt="Foto de portada">
+            <div class="profile-photo">
+                <img id="userimage" src="" alt="Foto de perfil">
+            </div>
+        </div>
+        
+        <div class="profile-details">
+            <h2 id="user-fullname"></h2>
+            <p id="user-type"></p>
+            <p id="user-biography"></p>
+        </div>
+
+        <button id="follow-btn" style="display: none;">Seguir</button>
+
+
+
+        <div class="tabs">
+            <div class="tab active" data-target="publicaciones">Publications</div>
+            <div class="tab" data-target="gallery">Photo gallery</div>
+        </div>
+        
+        <div class="tab-content publicaciones active">
+            <!-- Aquí se generarán dinámicamente las publicaciones -->
+        </div>
+        
+        <div class="tab-content gallery">
+            <div class="photo-grid" id="photo-gallery">
+                <!-- Fotos se generarán dinámicamente -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>

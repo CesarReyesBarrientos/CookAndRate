@@ -533,7 +533,7 @@ document.addEventListener('click', (event) => {
     if (event.target.classList.contains('Id_User')) {
         const userid = event.target.id;
         console.log('El ID del usuario:', userid);
-        window.open(`pagina-usuario.html?id=${userid}`, '_blank');
+        window.open(`pagina-usuarios.html?id=${userid}`, '_blank');
     }
 
     document.querySelectorAll('.interact').forEach(item => {
