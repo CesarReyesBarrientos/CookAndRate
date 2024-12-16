@@ -299,6 +299,7 @@ async function fetchCombinedPublications() {
         const recetasResponse = await fetch('http://25.61.139.76:3000/read-recetas');
         const recetasData = await recetasResponse.json();
         const recetas = recetasData.recetas;
+        //console.log(recetas);
         
 
         // Obtener chefs
@@ -533,7 +534,12 @@ document.addEventListener('click', (event) => {
     if (event.target.classList.contains('Id_User')) {
         const userid = event.target.id;
         console.log('El ID del usuario:', userid);
-        window.open(`pagina-usuarios.html?id=${userid}`, '_blank');
+        if (userid != userResult.ID_User) {
+            window.open(`pagina-usuarios.html?id=${userid}`);
+        }else {
+            window.open(`perfil.html`);
+        }
+        
     }
 
     document.querySelectorAll('.interact').forEach(item => {

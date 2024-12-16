@@ -58,7 +58,7 @@ function getUserData(token) {
           // Actualizar los datos del perfil en la vista
           document.querySelector('.profile-details h2').textContent =
             `${result.user.Nombre} ${result.user.ApellidoP} ${result.user.ApellidoM}`;
-          document.querySelector('.profile-details p:nth-of-type(2)').textContent =
+          document.querySelector('.biografia').textContent =
             result.user.Biografia || 'Sin descripción.';
           document.querySelector('.profile-photo img').src = `http://25.61.139.76:3000${result.user.imagen}`;
 
@@ -183,7 +183,6 @@ document.getElementById('edit-form').addEventListener('submit', async (event) =>
 });
 
 document.addEventListener('DOMContentLoaded', fetchRecetas);
-
 // Nuevo código para manejar pestañas
 document.addEventListener('DOMContentLoaded', () => {
   const tabs = document.querySelectorAll('.tab');
@@ -587,11 +586,14 @@ async function updateFollowersCount(userId) {
     // Encontrar el usuario actual en los críticos
     const criticProfile = criticsData.food_rev.find(critic => critic.ID_User === userId);
 
-    const followersElement = document.querySelector(".profile-details p:nth-child(2)");
+    const followersElement = document.getElementById("followers");
+    const followsElement = document.getElementById("follows");
+    // const biographyElement = document.getElementById("biagrafia");
 
     if (chefProfile) {
       // Si es chef (profesional o aficionado)
       followersElement.textContent = `${chefProfile.Seguidores.length} seguidores`;
+      followsElement.textContent = `${chefProfile.Seguidos.length} seguidos`;
     } else if (criticProfile) {
       // Si es crítico (consumidor)
       followersElement.textContent = `${criticProfile.Seguidos.length} seguidos`;
