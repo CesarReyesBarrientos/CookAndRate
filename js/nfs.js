@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function validateUserData(nombre, apellidoP, apellidoM, password) {
     try {
-        const response = await fetch(`http://25.61.139.76:3000/login?nombre=${nombre}&apellidoP=${apellidoP}&apellidoM=${apellidoM}&password=${password}`);
+        const response = await fetch(`http://192.168.50.209:3000/login?nombre=${nombre}&apellidoP=${apellidoP}&apellidoM=${apellidoM}&password=${password}`);
         
         if (!response.ok) {
             throw new Error('Usuario no encontrado o contraseña incorrecta');
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function fetchUsuarios() {
     try {
-        const response = await fetch('http://25.61.139.76:3000/read-users');
+        const response = await fetch('http://192.168.50.209:3000/read-users');
         if (!response.ok) {
             throw new Error('No se pudo obtener la lista de usuarios.');
         }
@@ -60,7 +60,7 @@ async function fetchUsuarios() {
 
             usuarioDiv.innerHTML = `
                 <h2>${usuario.Nombre} ${usuario['Apellido P']} ${usuario['Apellido M']}</h2>
-                <img src="http://25.61.139.76:3000/img/${usuario.imagen}" alt="Imagen de ${usuario.Nombre}" class="user-image">
+                <img src="http://192.168.50.209:3000/img/${usuario.imagen}" alt="Imagen de ${usuario.Nombre}" class="user-image">
                 <p><strong>ID de Usuario:</strong> ${usuario.ID_User}</p>
                 <p><strong>Email:</strong> ${usuario.Email}</p>
                 <p><strong>Teléfono:</strong> ${usuario.Telefono}</p>
@@ -79,7 +79,7 @@ async function fetchUsuarios() {
 async function fetchUserInfo(nombre, apellidoP, apellidoM) {
     try {
         // Construir la URL con los parámetros de consulta
-        const url = `http://25.61.139.76:3000/find-user-data?nombre=${nombre}&apellidoP=${apellidoP}&apellidoM=${apellidoM}`;
+        const url = `http://192.168.50.209:3000/find-user-data?nombre=${nombre}&apellidoP=${apellidoP}&apellidoM=${apellidoM}`;
         const response = await fetch(url);
 
         if (response.ok) {
@@ -90,7 +90,7 @@ async function fetchUserInfo(nombre, apellidoP, apellidoM) {
             container.innerHTML = '';
             container.innerHTML = `
                 <h2>${usuario.Nombre} ${usuario.ApellidoP} ${usuario.ApellidoM}</h2>
-                <img src="http://25.61.139.76:3000/img/${usuario.imagen}" alt="Imagen de ${usuario.Nombre}" class="user-image" style="width: 150px; border-radius: 50%; margin: 10px 0;">
+                <img src="http://192.168.50.209:3000/img/${usuario.imagen}" alt="Imagen de ${usuario.Nombre}" class="user-image" style="width: 150px; border-radius: 50%; margin: 10px 0;">
                 <p><strong>ID de Usuario:</strong> ${usuario.ID_User}</p>
                 <p><strong>Email:</strong> ${usuario.Email}</p>
                 <p><strong>Teléfono:</strong> ${usuario.Telefono}</p>

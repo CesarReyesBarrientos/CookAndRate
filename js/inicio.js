@@ -122,7 +122,7 @@ window.onload = () => {
 
 const getRecetas = async () => {
     try {
-        const response = await fetch('http://25.61.139.76:3000/read-recetas');
+        const response = await fetch('http://192.168.50.209:3000/read-recetas');
         if (response.ok) {
             const data = await response.json();
             //console.log(data);
@@ -149,7 +149,7 @@ const parseJWT = (token) => {
 const getChefData = async (userId) => {
     try {
         // Hacemos una solicitud POST al back-end
-        const response = await fetch('http://25.61.139.76:3000/find-chef-by-user-id', {
+        const response = await fetch('http://192.168.50.209:3000/find-chef-by-user-id', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -175,7 +175,7 @@ const getUserData = (token) => {
             //console.log('Datos del usuario', userData.userId);
             const data = {};
             data.userId = userData.userId;
-            fetch('http://25.61.139.76:3000/find-user-by-id', {
+            fetch('http://192.168.50.209:3000/find-user-by-id', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -215,7 +215,7 @@ function updateUserInterface() {
         
         // Ejemplo: actualizar imagen de perfil
         if (userResult.imagen) {
-            const userImage = `http://25.61.139.76:3000${userResult.imagen}`;
+            const userImage = `http://192.168.50.209:3000${userResult.imagen}`;
             const userIconElement = document.getElementById('userIcon');
             if (userIconElement) {
                 userIconElement.src = userImage;
@@ -237,8 +237,8 @@ function generarPublicaciones(recetas, chefs, users) {
         const user = chef ? users.find(u => u.ID_User === chef.ID_User) : null;
 
         const chefImage = user
-            ? `http://25.61.139.76:3000/img/userIcons/${user.imagen}`
-            : 'http://25.61.139.76:3000/img/userIcons/default.png';
+            ? `http://192.168.50.209:3000/img/userIcons/${user.imagen}`
+            : 'http://192.168.50.209:3000/img/userIcons/default.png';
         const chefName = user ? `${user.Nombre} ${user.ApellidoP}` : 'Chef Desconocido';
         const publicacion = document.createElement('div');
         publicacion.classList.add('publicacion');
@@ -291,24 +291,24 @@ tabs.forEach(tab => {
 async function fetchCombinedPublications() {
     try {
         // Obtener anuncios
-        const anunciosResponse = await fetch('http://25.61.139.76:3000/read-anuncios');
+        const anunciosResponse = await fetch('http://192.168.50.209:3000/read-anuncios');
         const anunciosData = await anunciosResponse.json();
         const anuncios = anunciosData.anuncios;
 
         // Obtener recetas
-        const recetasResponse = await fetch('http://25.61.139.76:3000/read-recetas');
+        const recetasResponse = await fetch('http://192.168.50.209:3000/read-recetas');
         const recetasData = await recetasResponse.json();
         const recetas = recetasData.recetas;
         //console.log(recetas);
         
 
         // Obtener chefs
-        const chefsResponse = await fetch('http://25.61.139.76:3000/read-chefs');
+        const chefsResponse = await fetch('http://192.168.50.209:3000/read-chefs');
         const chefsData = await chefsResponse.json();
         const chefs = chefsData.chefs;
 
         // Obtener usuarios
-        const usersResponse = await fetch('http://25.61.139.76:3000/read-users');
+        const usersResponse = await fetch('http://192.168.50.209:3000/read-users');
         const usersData = await usersResponse.json();
         const users = usersData.users;
         // console.log(recetas);
@@ -397,8 +397,8 @@ function generarPublicacionesCombinadas(publications) {
             const receta = publication.data;
             const user = publication.user;
             const chefImage = user
-                ? `http://25.61.139.76:3000/img/userIcons/${user.imagen}`
-                : 'http://25.61.139.76:3000/img/userIcons/default.png';
+                ? `http://192.168.50.209:3000/img/userIcons/${user.imagen}`
+                : 'http://192.168.50.209:3000/img/userIcons/default.png';
             const chefName = user ? `${user.Nombre} ${user.ApellidoP}` : 'Chef Desconocido';
             publicacion.innerHTML = `
                 <div class="containerColumn">
@@ -479,7 +479,7 @@ document.addEventListener('DOMContentLoaded', fetchCombinedPublications);
 async function setUserInteracts() {
     try {
         // Obtener las recetas desde el servidor
-        const recetasResponse = await fetch('http://25.61.139.76:3000/read-recetas');
+        const recetasResponse = await fetch('http://192.168.50.209:3000/read-recetas');
         const recetasData = await recetasResponse.json();
         const recetas = recetasData.recetas;
         recetasPagina = recetas;
@@ -615,7 +615,7 @@ function registrarInteraccion(event) {
         };
 
         // Hacer la solicitud POST
-        fetch('http://25.61.139.76:3000/add-interaction', {
+        fetch('http://192.168.50.209:3000/add-interaction', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -672,7 +672,7 @@ function registrarCalificacion(event) {
         };
 
         // Hacer la solicitud POST para agregar la calificación
-        fetch('http://25.61.139.76:3000/add-rating', {
+        fetch('http://192.168.50.209:3000/add-rating', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -694,7 +694,7 @@ const enviarIcon = document.querySelector('.enviar_');
 const ratingSelect = document.querySelector('.rating');
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('http://25.61.139.76:3000/top-3-recetas')
+    fetch('http://192.168.50.209:3000/top-3-recetas')
         .then(response => response.json())
         .then(data => {
             const chefsContainer = document.querySelector('.chefs');
@@ -713,7 +713,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 chefCard.innerHTML = `
                     <div class="chef-carousel">
                         <div class="chef-carousel-images">
-                            <img src='http://25.61.139.76:3000/img/recetas/${receta.Imagen}' alt="${receta.Nombre}">
+                            <img src='http://192.168.50.209:3000/img/recetas/${receta.Imagen}' alt="${receta.Nombre}">
                         </div>
                     </div>
                     <div class="chef-text-below">${receta.Nombre.toUpperCase()}</div>

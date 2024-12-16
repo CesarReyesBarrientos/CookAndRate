@@ -15,7 +15,7 @@ async function validateUserData(email, password) {
     const emailError = document.getElementById('emailError');
 
     try {
-        const response = await fetch(`http://25.61.139.76:3000/login?Email=${email}&password=${password}`);
+        const response = await fetch(`http://192.168.50.209:3000/login?Email=${email}&password=${password}`);
         const data = await response.json();
 
         if (data.message === "COI") {

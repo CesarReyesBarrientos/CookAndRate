@@ -48,7 +48,7 @@ function updateUserInterface() {
                 
         // Ejemplo: actualizar imagen de perfil
         if (userResult.imagen) {
-            const userImage = `http://25.61.139.76:3000${userResult.imagen}`;
+            const userImage = `http://192.168.50.209:3000${userResult.imagen}`;
             document.getElementById('userIcon').src = userImage;
             // console.log(foodRResult.Seguidos);
         }
@@ -71,7 +71,7 @@ const getUserData = (token) => {
             //console.log('Datos del usuario', userData.userId);
             const data = {};
             data.userId = userData.userId;
-            fetch('http://25.61.139.76:3000/find-user-by-id', {
+            fetch('http://192.168.50.209:3000/find-user-by-id', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -193,7 +193,7 @@ function lazyLoadMaps() {
 }
 
 // Obtener el token de Mapbox y configurar los mapas
-fetch('http://25.61.139.76:3000/mapbox-token')
+fetch('http://192.168.50.209:3000/mapbox-token')
     .then(response => response.json())
     .then(data => {
         mapboxgl.accessToken = data.token;

@@ -67,7 +67,7 @@ const getUserData = (token) => {
             //console.log('Datos del usuario', userData.userId);
             const data = {};
             data.userId = userData.userId;
-            fetch('http://25.61.139.76:3000/find-user-by-id', {
+            fetch('http://192.168.50.209:3000/find-user-by-id', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -107,7 +107,7 @@ function updateUserInterface() {
         
         // Ejemplo: actualizar imagen de perfil
         if (userResult.imagen) {
-            const userImage = `http://25.61.139.76:3000${userResult.imagen}`;
+            const userImage = `http://192.168.50.209:3000${userResult.imagen}`;
             const userIconElement = document.getElementById('userIcon');
             if (userIconElement) {
                 userIconElement.src = userImage;
@@ -134,7 +134,7 @@ window.addEventListener("scroll", () => {
 
 const obtenerDetallesChef = (idChef) => {
     return new Promise((resolve, reject) => {
-        fetch(`http://25.61.139.76:3000/chef/${idChef}`, {
+        fetch(`http://192.168.50.209:3000/chef/${idChef}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -171,7 +171,7 @@ obtenerDetallesChef(userid).then(() => {
     const followsElement = document.getElementById('follows');
 
     nombreUsuario.textContent = usuarioChefResult.Nombre+" "+usuarioChefResult.ApellidoP+" "+usuarioChefResult.ApellidoM;
-    imagenUsuario.src = `http://25.61.139.76:3000/img/userIcons/${usuarioChefResult.imagen}`;
+    imagenUsuario.src = `http://192.168.50.209:3000/img/userIcons/${usuarioChefResult.imagen}`;
     biographyElement.textContent = usuarioChefResult.Biografia;
     followersElement.textContent = chefResult.Seguidores.length+" followers";
     followsElement.textContent = chefResult.Seguidos.length+" follows";
@@ -179,7 +179,7 @@ obtenerDetallesChef(userid).then(() => {
     console.error('Error:', error);
 });
 
-fetch(`http://25.61.139.76:3000/chef/${userid}`) 
+fetch(`http://192.168.50.209:3000/chef/${userid}`) 
   .then(response => response.json())
   .then(data => {
     const chef = data.chef;
@@ -194,7 +194,7 @@ fetch(`http://25.61.139.76:3000/chef/${userid}`)
         publicacion.classList.add('publicacion');
       publicacion.innerHTML = `
         <div style="display: flex; align-items: center; margin-bottom: 5px;">
-          <img style="height: 70px; width: 70px; margin-right: 10px;" src="http://25.61.139.76:3000/img/userIcons/${usuario.imagen}" alt="Foto de perfil">
+          <img style="height: 70px; width: 70px; margin-right: 10px;" src="http://192.168.50.209:3000/img/userIcons/${usuario.imagen}" alt="Foto de perfil">
           <div class="text-container">
             <h2 style="font-size: 18px; margin: 0;">${receta.Titulo_Receta}</h2>
             <p style="font-size: 14px; color: gray; margin: 2px 0;">By ${usuario.Nombre} ${usuario.ApellidoP} ${usuario.ApellidoM}</p>
@@ -217,7 +217,7 @@ fetch(`http://25.61.139.76:3000/chef/${userid}`)
       carousel.innerHTML = ` 
         <button class="btn left">&lt;</button>
         <div class="carousel-images">
-          ${receta.Imagenes.map((imgUrl) => `<img src="http://25.61.139.76:3000/img/recetas/${imgUrl}" alt="Imagen de receta">`).join('')}
+          ${receta.Imagenes.map((imgUrl) => `<img src="http://192.168.50.209:3000/img/recetas/${imgUrl}" alt="Imagen de receta">`).join('')}
         </div>
         <button class="btn right">&gt;</button>
       `;
@@ -294,7 +294,7 @@ tabs.forEach(tab => {
 async function setUserInteracts() {
     try {
         // Obtener las recetas desde el servidor
-        const recetasResponse = await fetch('http://25.61.139.76:3000/read-recetas');
+        const recetasResponse = await fetch('http://192.168.50.209:3000/read-recetas');
         const recetasData = await recetasResponse.json();
         const recetas = recetasData.recetas;
         recetasChefResult = recetas;
@@ -425,7 +425,7 @@ function registrarInteraccion(event) {
         };
 
         // Hacer la solicitud POST
-        fetch('http://25.61.139.76:3000/add-interaction', {
+        fetch('http://192.168.50.209:3000/add-interaction', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -481,7 +481,7 @@ function registrarCalificacion(event) {
         };
 
         // Hacer la solicitud POST para agregar la calificación
-        fetch('http://25.61.139.76:3000/add-rating', {
+        fetch('http://192.168.50.209:3000/add-rating', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -509,7 +509,7 @@ document.addEventListener('click', (event) => {
     if (event.target.classList.contains('follow')) {
         // Lógica para seguir
         if (userResult.TipoUsuario === "Critico" || userResult.TipoUsuario === "Consumidor") {
-            fetch('http://25.61.139.76:3000/seguir-usuario', {
+            fetch('http://192.168.50.209:3000/seguir-usuario', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -531,7 +531,7 @@ document.addEventListener('click', (event) => {
                 console.error('Error:', error);
             });
         } else if (userResult.TipoUsuario === "Chef Aficionado" || userResult.TipoUsuario === "Chef Profesional") {
-            fetch('http://25.61.139.76:3000/seguir-chef', {
+            fetch('http://192.168.50.209:3000/seguir-chef', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -557,7 +557,7 @@ document.addEventListener('click', (event) => {
         // Determinar si es un crítico o un chef
         if (userResult.TipoUsuario === "Crítico" || userResult.TipoUsuario === "Consumidor") {
             // Llamada para que un crítico deje de seguir a un chef
-            fetch('http://25.61.139.76:3000/dejar-seguir-usuario', {
+            fetch('http://192.168.50.209:3000/dejar-seguir-usuario', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -584,7 +584,7 @@ document.addEventListener('click', (event) => {
             });
         } else if (userResult.TipoUsuario === "Chef Aficionado" || userResult.TipoUsuario === "Chef Profesional") {
             // Llamada para que un chef deje de seguir a otro chef
-            fetch('http://25.61.139.76:3000/dejar-seguir-chef', {
+            fetch('http://192.168.50.209:3000/dejar-seguir-chef', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

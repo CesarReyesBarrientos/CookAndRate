@@ -22,6 +22,7 @@ window.addEventListener("scroll", () => {
 }
 });
 
+
 function updateUserInterface() {
     if (userResult) {
         // Update user name
@@ -40,7 +41,7 @@ function updateUserInterface() {
             console.log('User imagen:', userResult.imagen); // Depuración
             
             if (userResult.imagen) {
-                const userImage = `http://25.61.139.76:3000${userResult.imagen}`;
+                const userImage = `http://192.168.50.209:3000${userResult.imagen}`;
 
                 console.log('Full image URL:', userImage); // Depuración
                 
@@ -77,7 +78,7 @@ const getUserData = (token) => {
         if (userData) {
             const data = {};
             data.userId = userData.userId;
-            fetch('http://25.61.139.76:3000/find-user-by-id', {
+            fetch('http://192.168.50.209:3000/find-user-by-id', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -117,10 +118,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
         // Obtener las recetas, los críticos y los usuarios (chefs) desde las APIs
         const [recetasResponse, criticosResponse, usersResponse, chefResponse] = await Promise.all([
-            fetch('http://25.61.139.76:3000/read-recetas'),
-            fetch('http://25.61.139.76:3000/read-food-critics'),
-            fetch('http://25.61.139.76:3000/read-users'),
-            fetch('http://25.61.139.76:3000/read-chefs')  // Obtenemos los usuarios (chefs)
+            fetch('http://192.168.50.209:3000/read-recetas'),
+            fetch('http://192.168.50.209:3000/read-food-critics'),
+            fetch('http://192.168.50.209:3000/read-users'),
+            fetch('http://192.168.50.209:3000/read-chefs')  // Obtenemos los usuarios (chefs)
         ]);
 
         const recetasData = await recetasResponse.json();
@@ -219,7 +220,7 @@ const displayChefRanking = (ranking, chefsMap) => {
 
         // Obtener la imagen del chef
         const chefImage = chefsMap.get(chef.chefId) || 'default.jpg';
-        const imagePath = `http://25.61.139.76:3000/img/userIcons/${chefImage}`;
+        const imagePath = `http://192.168.50.209:3000/img/userIcons/${chefImage}`;
 
         // Crear la sección de imagen
         const imageDiv = document.createElement('div');
@@ -229,7 +230,7 @@ const displayChefRanking = (ranking, chefsMap) => {
         img.src = imagePath;
         img.alt = `Chef ${chef.chefId}`;
         img.onerror = () => {
-            img.src = 'http://25.61.139.76:3000/img/userIcons/default.jpg';
+            img.src = 'http://192.168.50.209:3000/img/userIcons/default.jpg';
         };
 
         imageDiv.appendChild(img);

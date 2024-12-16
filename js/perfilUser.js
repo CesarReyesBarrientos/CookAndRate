@@ -46,7 +46,7 @@ function getUserData(token) {
   const userData = parseJWT(token);
   if (userData) {
     const data = { userId: userData.userId };
-    return fetch('http://25.61.139.76:3000/find-user-by-id', {
+    return fetch('http://192.168.50.209:3000/find-user-by-id', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -60,7 +60,7 @@ function getUserData(token) {
             `${result.user.Nombre} ${result.user.ApellidoP} ${result.user.ApellidoM}`;
           document.querySelector('.biografia').textContent =
             result.user.Biografia || 'Sin descripción.';
-          document.querySelector('.profile-photo img').src = `http://25.61.139.76:3000${result.user.imagen}`;
+          document.querySelector('.profile-photo img').src = `http://192.168.50.209:3000${result.user.imagen}`;
 
           // Llamar a la función para actualizar el número de seguidores/seguidos
           updateFollowersCount(result.user.ID_User);
@@ -130,7 +130,7 @@ document.getElementById('edit-form').addEventListener('submit', async (event) =>
   try {
       // Validar correo solo si ha cambiado
       if (email !== originalEmail) {
-          const checkResponse = await fetch('http://25.61.139.76:3000/checkEmail', {
+          const checkResponse = await fetch('http://192.168.50.209:3000/checkEmail', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email }),
@@ -144,7 +144,7 @@ document.getElementById('edit-form').addEventListener('submit', async (event) =>
       }
 
       // Actualizar perfil
-      const updateResponse = await fetch('http://25.61.139.76:3000/update-user', {
+      const updateResponse = await fetch('http://192.168.50.209:3000/update-user', {
           method: 'POST',
           body: formData,
       });
@@ -161,7 +161,7 @@ document.getElementById('edit-form').addEventListener('submit', async (event) =>
           document.querySelector('.profile-details p:nth-of-type(2)').textContent =
               updatedUser.Biografia || 'Sin descripción.';
             // if (updatedUser.imagen) {
-              const imgUser = `http://25.61.139.76:3000/img/userIcons/${updatedUser.imagen}?t=${Date.now()}`;
+              const imgUser = `http://192.168.50.209:3000/img/userIcons/${updatedUser.imagen}?t=${Date.now()}`;
             
 
           // Actualizar el formulario con los nuevos valores
@@ -210,19 +210,19 @@ async function fetchRecetas() {
     const userData = JSON.parse(atob(token.split('.')[1]));
     const currentUserId = userData.userId;
 
-    const recetasResponse = await fetch('http://25.61.139.76:3000/read-recetas');
+    const recetasResponse = await fetch('http://192.168.50.209:3000/read-recetas');
     const recetasData = await recetasResponse.json();
     const recetas = recetasData.recetas;
 
-    const chefsResponse = await fetch('http://25.61.139.76:3000/read-chefs');
+    const chefsResponse = await fetch('http://192.168.50.209:3000/read-chefs');
     const chefsData = await chefsResponse.json();
     const chefs = chefsData.chefs;
 
-    const usersResponse = await fetch('http://25.61.139.76:3000/read-users');
+    const usersResponse = await fetch('http://192.168.50.209:3000/read-users');
     const usersData = await usersResponse.json();
     const users = usersData.users;
 
-    const criticResponse = await fetch('http://25.61.139.76:3000/read-food-critics');
+    const criticResponse = await fetch('http://192.168.50.209:3000/read-food-critics');
     const criticData = await criticResponse.json();
     const critics = criticData.food_rev;
 
@@ -248,7 +248,7 @@ async function fetchRecetas() {
       
       // Collect all images from the chef's recipes for the gallery
       filteredImages = filteredRecetas.flatMap(receta => 
-        receta.Imagenes.map(img => img.startsWith('http') ? img : `http://25.61.139.76:3000/img/recetas/${img}`)
+        receta.Imagenes.map(img => img.startsWith('http') ? img : `http://192.168.50.209:3000/img/recetas/${img}`)
       );      
     } else if (currentCritic) {
       // If user is a critic, leave recipes empty
@@ -270,8 +270,8 @@ function generarPublicaciones(recetas, chefs, users) {
     const user = chef ? users.find((u) => u.ID_User === chef.ID_User) : null;
     //console.log(user);
     const chefImage = user
-      ? `http://25.61.139.76:3000/img/userIcons/${user.imagen}?t=${Date.now()}`
-      : 'http://25.61.139.76:3000/img/default.png?t=${Date.now()}';
+      ? `http://192.168.50.209:3000/img/userIcons/${user.imagen}?t=${Date.now()}`
+      : 'http://192.168.50.209:3000/img/default.png?t=${Date.now()}';
     const chefName = user ? `${user.Nombre} ${user.ApellidoP}` : 'Chef Desconocido';
 
     const publicacion = document.createElement('div');
@@ -423,7 +423,7 @@ document.getElementById('logout').addEventListener('click', async () => {
   
   try {
       // Opción 1: Si necesitas hacer una solicitud al servidor para cerrar sesión
-      await fetch('http://25.61.139.76:3000/logout', {
+      await fetch('http://192.168.50.209:3000/logout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token }),
@@ -455,7 +455,7 @@ document.getElementById('deactivate-account').addEventListener('click', async ()
   try {
       //console.log('Enviando userId al servidor:', userId); // Log para verificar
 
-      const response = await fetch('http://25.61.139.76:3000/deactivate-account', {
+      const response = await fetch('http://192.168.50.209:3000/deactivate-account', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId }),
@@ -510,7 +510,7 @@ function updateUserInterface() {
       
       // Ejemplo: actualizar imagen de perfil
       if (userResult.imagen) {
-          const userImage = `http://25.61.139.76:3000${userResult.imagen}`;
+          const userImage = `http://192.168.50.209:3000${userResult.imagen}`;
           const userIconElement = document.getElementById('userIcon');
           if (userIconElement) {
               userIconElement.src = userImage;
@@ -522,7 +522,7 @@ function updateUserInterface() {
 async function setUserInteracts() {
   try {
       // Obtener las recetas desde el servidor
-      const recetasResponse = await fetch('http://25.61.139.76:3000/read-recetas');
+      const recetasResponse = await fetch('http://192.168.50.209:3000/read-recetas');
       const recetasData = await recetasResponse.json();
       const recetas = recetasData.recetas;
       recetasPagina = recetas;
@@ -573,8 +573,8 @@ async function updateFollowersCount(userId) {
   try {
     // Solicitar información de chefs y críticos
     const [chefsResponse, criticsResponse] = await Promise.all([
-      fetch('http://25.61.139.76:3000/read-chefs'),
-      fetch('http://25.61.139.76:3000/read-food-critics')
+      fetch('http://192.168.50.209:3000/read-chefs'),
+      fetch('http://192.168.50.209:3000/read-food-critics')
     ]);
 
     const chefsData = await chefsResponse.json();
@@ -726,7 +726,7 @@ function initRecipePublication() {
 
       try {
           // Send recipe to server
-          const response = await fetch('http://25.61.139.76:3000/create-recipe', {
+          const response = await fetch('http://192.168.50.209:3000/create-recipe', {
               method: 'POST',
               body: formData
           });
@@ -778,7 +778,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const token = localStorage.getItem('authToken');
   const userData = JSON.parse(atob(token.split('.')[1]));
   
-  fetch('http://25.61.139.76:3000/read-chefs')
+  fetch('http://192.168.50.209:3000/read-chefs')
       .then(response => response.json())
       .then(chefsData => {
           const isChef = chefsData.chefs.some(chef => chef.ID_User === userData.userId);
@@ -867,7 +867,7 @@ function registrarInteraccion(event) {
       };
 
       // Hacer la solicitud POST
-      fetch('http://25.61.139.76:3000/add-interaction', {
+      fetch('http://192.168.50.209:3000/add-interaction', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
