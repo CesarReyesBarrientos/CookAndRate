@@ -555,7 +555,7 @@ document.addEventListener('click', (event) => {
         }
     } else if (event.target.classList.contains('unfollow')) {
         // Determinar si es un crítico o un chef
-        if (userResult.TipoUsuario === "Crítico") {
+        if (userResult.TipoUsuario === "Crítico" || userResult.TipoUsuario === "Consumidor") {
             // Llamada para que un crítico deje de seguir a un chef
             fetch('http://25.61.139.76:3000/dejar-seguir-usuario', {
                 method: 'POST',

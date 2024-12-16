@@ -234,7 +234,7 @@ function checkPasswords() {
 
 async function checkEmail(email) {
     try {
-        const response = await fetch('http://localhost:3000/checkEmail', {
+        const response = await fetch('http://25.61.139.76:3000/checkEmail', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
