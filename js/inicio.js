@@ -229,9 +229,9 @@ function generarPublicaciones(recetas, chefs, users) {
     publicacionesContainer.innerHTML = ''; 
     const recetasAleatorios = recetas.sort(() => Math.random() - 0.5);
     // Limitar a las primeras 10 recetas
-    const recetasLimitadas = recetas.slice(0, 5);
+    // const recetasLimitadas = recetas.slice(0, );
 
-    recetasLimitadas.forEach(receta => {
+    recetasAleatorios.forEach(receta => {
         // Encontrar al chef correspondiente
         const chef = chefs.find(c => c.Id_Chef === receta.Id_Chef);
         const user = chef ? users.find(u => u.ID_User === chef.ID_User) : null;

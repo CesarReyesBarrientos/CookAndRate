@@ -21,6 +21,26 @@ window.onload = () => {
         getUserData(token)
             .then(() => {
                 updateUserInterface();
+                // console.log(userResult); //Logeado
+                // console.log(chefResult);
+                let followBtn = document.querySelector('.follow');
+                const user = userResult.ID_User;
+                const chef = usuarioChefResult;
+                if (followBtn && chef && user) {
+                    // // Verificar si el usuario ya sigue al chef
+                    const isFollowing = chefResult.Seguidores.includes(user);
+                    if (isFollowing) {
+                        followBtn.textContent = 'Unfollow';
+                        followBtn.classList.remove('follow');
+                        followBtn.classList.add('unfollow');
+                        console.log("Unfollow");
+                    } else {
+                        followBtn.textContent = 'Follow';
+                        followBtn.classList.remove('unfollow');
+                        followBtn.classList.add('follow');
+                        console.log("Follow");
+                    }
+                }
             })
             .catch(error => {
                 console.error('Error al obtener datos de usuario:', error);
@@ -58,7 +78,7 @@ const getUserData = (token) => {
             .then((result) => {
                 userResult = result.user;
                 if (result.chef) {
-                    chefResult = result.chef;
+                    // chefResult = result.chef;
                     recetasChefResult = result.recetas;
                 } else {
                     foodRResult = result.foodr;
@@ -131,7 +151,7 @@ const obtenerDetallesChef = (idChef) => {
             chefResult = result.chef;
             recetasChefResult = result.recetas;
             usuarioChefResult = result.usuario;
-            
+            // console.log(chefResult);
 
             resolve(result);
         })
@@ -144,16 +164,11 @@ const obtenerDetallesChef = (idChef) => {
 
 // Ejemplo de uso
 obtenerDetallesChef(userid).then(() => {
-    // Ahora puedes usar chefResult, recetasChefResult, usuarioChefResult
-    // console.log(chefResult);
-    //console.log(recetasChefResult);
     const nombreUsuario = document.getElementById("user-fullname");
     const imagenUsuario = document.getElementById("userimage");
     const biographyElement = document.getElementById("user-biography");
     const followersElement = document.getElementById('followers');
     const followsElement = document.getElementById('follows');
-    // console.log(usuarioChefResult);
-    // console.log(chefResult);
 
     nombreUsuario.textContent = usuarioChefResult.Nombre+" "+usuarioChefResult.ApellidoP+" "+usuarioChefResult.ApellidoM;
     imagenUsuario.src = `http://25.61.139.76:3000/img/userIcons/${usuarioChefResult.imagen}`;
@@ -167,24 +182,13 @@ obtenerDetallesChef(userid).then(() => {
 fetch(`http://25.61.139.76:3000/chef/${userid}`) 
   .then(response => response.json())
   .then(data => {
-    // Obtener los elementos donde se mostrará la información
-    
-    //console.log(usuarioChefResult);
-    // Asignar los valores del objeto user a los elementos del DOM
-    // nombreUsuario.textContent = usuarioChefResult.Nombre+" "+usuarioChefResult.ApellidoP+" "+usuarioChefResult.ApellidoM;
-    // console.log(`http://25.61.139.76:3000/img/userIcons/${usuarioChefResult.imagen}`);
-    // imagenUsuario.src = `http://25.61.139.76:3000/img/userIcons/${usuarioChefResult.imagen}`;
-    // biographyElement.textContent = usuarioChefResult.biography;
-
     const chef = data.chef;
     recetasChefResult = data.recetas;
     const usuario = data.usuario;
-    //console.log(recetasChefResult.length);
     setUserInteracts();
     // Imprimir cada receta
     recetasChefResult.forEach(receta => {
         const publicacionesContainer = document.querySelector('.tab-content.publicaciones');
-        //publicacionesContainer.innerHTML = '';
 
         const publicacion = document.createElement('div');
         publicacion.classList.add('publicacion');
@@ -499,13 +503,113 @@ const enviarIcon = document.querySelector('.enviar_');
 const ratingSelect = document.querySelector('.rating');
 
 document.addEventListener('click', (event) => {
+    const button = event.target;
+    const user = userResult.ID_User;
+    const chef = userid;
     if (event.target.classList.contains('follow')) {
-        const user = userResult.ID_User;
-        const chef = userid;
+        // Lógica para seguir
         if (userResult.TipoUsuario === "Critico" || userResult.TipoUsuario === "Consumidor") {
-            console.log("Critico "+user+" siguio a chef "+chef);
-        }else if (userResult.TipoUsuario === "Chef Aficionado" || userResult.TipoUsuario === "Chef Profesional"){
-            console.log("Chef "+user+" siguio a chef "+chef);
+            fetch('http://25.61.139.76:3000/seguir-usuario', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user, chef })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Critico " + user + " siguió a chef " + chef);
+                console.log(data);
+                button.classList.remove('follow');
+                button.classList.add('unfollow');
+                button.textContent = 'Unfollow';
+                const followersElement = document.getElementById('followers');
+                const currentFollowers = parseInt(followersElement.textContent);
+                followersElement.textContent = `${currentFollowers + 1} followers`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        } else if (userResult.TipoUsuario === "Chef Aficionado" || userResult.TipoUsuario === "Chef Profesional") {
+            fetch('http://25.61.139.76:3000/seguir-chef', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user, chef })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Chef " + user + " siguió a chef " + chef);
+                console.log(data);
+                button.classList.remove('follow');
+                button.classList.add('unfollow');
+                button.textContent = 'Unfollow';
+                const followersElement = document.getElementById('followers');
+                const currentFollowers = parseInt(followersElement.textContent);
+                followersElement.textContent = `${currentFollowers + 1} followers`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    } else if (event.target.classList.contains('unfollow')) {
+        // Determinar si es un crítico o un chef
+        if (userResult.TipoUsuario === "Crítico") {
+            // Llamada para que un crítico deje de seguir a un chef
+            fetch('http://25.61.139.76:3000/dejar-seguir-usuario', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user: user,  // ID del crítico
+                    chef: chef   // ID del chef a dejar de seguir
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Critico " + user + " dejó de seguir a chef " + chef);
+                console.log(data);
+                // Aquí puedes agregar lógica adicional como actualizar la interfaz
+                button.classList.remove('unfollow');
+                button.classList.add('follow');
+                button.textContent = 'Follow';
+                const followersElement = document.getElementById('followers');
+                const currentFollowers = parseInt(followersElement.textContent);
+                followersElement.textContent = `${currentFollowers - 1} followers`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        } else if (userResult.TipoUsuario === "Chef Aficionado" || userResult.TipoUsuario === "Chef Profesional") {
+            // Llamada para que un chef deje de seguir a otro chef
+            fetch('http://25.61.139.76:3000/dejar-seguir-chef', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user: user,   // ID del chef que deja de seguir
+                    chef: chef    // ID del chef a quien deja de seguir
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Chef " + user + " dejó de seguir a chef " + chef);
+                console.log(data);
+                button.classList.remove('unfollow');
+                button.classList.add('follow');
+                button.textContent = 'Follow';
+                const followersElement = document.getElementById('followers');
+                const currentFollowers = parseInt(followersElement.textContent);
+                followersElement.textContent = `${currentFollowers - 1} followers`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         }
     }
 });
+
+

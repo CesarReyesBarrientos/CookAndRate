@@ -355,18 +355,34 @@ body {
 
   .follow {
     width: 10%;
-      padding: 10px;
-      background-color: #2f3031;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      margin-top: 15px;
-      cursor: pointer;
-  }
+    padding: 10px;
+    background-color: #2f3031;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    margin-top: 15px;
+    cursor: pointer;
+}
 
-  .follow:hover {
+.follow:hover {
     background-color: #181818;
-  }
+}
+
+.unfollow {
+    width: 10%;
+    padding: 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+.unfollow:hover {
+    background-color: darkred;
+}
+
   
   #edit-profile:hover, #logout:hover {
     background-color: #618f63;
