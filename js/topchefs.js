@@ -1,121 +1,26 @@
 let userResult; // Add this at the top of your script
-
-document.addEventListener("DOMContentLoaded", async () => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-        alert('No estás autenticado. Por favor, inicia sesión.');
-        window.location.href = 'index.html';
-    } else {
-        getUserData(token)
-            .then(() => {
-                updateUserInterface();
-            })
-            .catch(error => {
-                console.error('Error al obtener datos de usuario:', error);
-            });
-    }
-    try {
-        // Obtener datos de chefs
-        const chefsResponse = await fetch('http://25.61.139.76:3000/read-chefs');
-        const chefsData = await chefsResponse.json();
-
-        // Obtener datos de recetas
-        const recetasResponse = await fetch('http://25.61.139.76:3000/read-recetas');
-        const recetasData = await recetasResponse.json();
-
-        // Obtener datos de usuarios
-        const usersResponse = await fetch('http://25.61.139.76:3000/read-users');
-        const usersData = await usersResponse.json();
-
-        const chefs = chefsData.chefs;
-        const recipes = recetasData.recetas;
-        const users = usersData.users;
-
-        // Calcular la popularidad de los chefs basándonos en los comentarios de las recetas
-        const chefPopularity = {};
-
-        recipes.forEach(recipe => {
-            const chefId = recipe.ID_Chef;
-            const comments = recipe.Comentarios.length;
-
-            if (!chefPopularity[chefId]) {
-                chefPopularity[chefId] = 0;
-            }
-            chefPopularity[chefId] += comments;
-        });
-
-        // Ordenar chefs por popularidad
-        const sortedChefs = Object.entries(chefPopularity)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 3) // Top 3 chefs
-            .map(([chefId]) => {
-                const chef = chefs.find(c => c.ID_Chef === chefId);
-                const user = users.find(u => u.ID_User === chef.ID_User);
-                return {
-                    ...chef,
-                    nombreCompleto: `${user.Nombre} ${user.ApellidoP} ${user.ApellidoM || ''}`.trim(),
-                    imagen: user.imagen
-                };
-            });
-
-        // Actualizar el DOM con el podio
-        const podium = document.querySelector('.podium');
-        podium.innerHTML = ''; // Limpiar contenido existente
-
-        const positions = ['podium-first', 'podium-second', 'podium-third'];
-
-        sortedChefs.forEach((chef, index) => {
-            const chefCard = document.createElement('div');
-            chefCard.classList.add('chef-card', positions[index]); // Agregar clase para posición
-
-            const imageDiv = document.createElement('div');
-            imageDiv.classList.add('chef-carousel-images');
-            const img = document.createElement('img');
-            img.src = `http://25.61.139.76:3000/img/userIcons/${chef.imagen}`; // Ajustar ruta de imágenes
-            img.alt = `Chef ${chef.nombreCompleto}`;
-            imageDiv.appendChild(img);
-
-            const nameDiv = document.createElement('div');
-            nameDiv.classList.add('chef-text-below');
-            nameDiv.textContent = chef.nombreCompleto;
-
-            const positionLabel = document.createElement('div');
-            positionLabel.classList.add('position-label');
-            positionLabel.textContent = `${index + 1}${index === 0 ? 'er' : 'do'} Lugar`;
-
-            chefCard.appendChild(imageDiv);
-            chefCard.appendChild(nameDiv);
-            chefCard.appendChild(positionLabel);
-            podium.appendChild(chefCard);
-        });
-    } catch (error) {
-        console.error('Error al obtener los datos:', error);
-    }
-});
-
-// Menú interactivo
 const menuButton = document.getElementById("menuButton");
 const menuWindow = document.getElementById("menuWindow");
 const closeMenu = document.getElementById("closeMenu");
-
+const header = document.getElementById("mainHeader");
+// Abrir menú
 menuButton.addEventListener("click", () => {
     menuWindow.classList.add("open");
 });
 
+// Cerrar menú
 closeMenu.addEventListener("click", () => {
     menuWindow.classList.remove("open");
 });
 
 // Detectar scroll y agregar sombra al header
-const header = document.getElementById("mainHeader");
 window.addEventListener("scroll", () => {
     if (window.scrollY > 0) {
         header.classList.add("scrolled");
     } else {
         header.classList.remove("scrolled");
-    }
+}
 });
-
 
 function updateUserInterface() {
     if (userResult) {
@@ -193,4 +98,171 @@ const getUserData = (token) => {
             reject('Token inválido');
         }
     });
+};
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        alert('No estás autenticado. Por favor, inicia sesión.');
+        window.location.href = 'index.html';
+    } else {
+        getUserData(token)
+            .then(() => {
+                updateUserInterface();
+            })
+            .catch(error => {
+                console.error('Error al obtener datos de usuario:', error);
+            });
+    }
+    try {
+        // Obtener las recetas, los críticos y los usuarios (chefs) desde las APIs
+        const [recetasResponse, criticosResponse, usersResponse, chefResponse] = await Promise.all([
+            fetch('http://25.61.139.76:3000/read-recetas'),
+            fetch('http://25.61.139.76:3000/read-food-critics'),
+            fetch('http://25.61.139.76:3000/read-users'),
+            fetch('http://25.61.139.76:3000/read-chefs')  // Obtenemos los usuarios (chefs)
+        ]);
+
+        const recetasData = await recetasResponse.json();
+        const criticosData = await criticosResponse.json();
+        const usersData = await usersResponse.json();
+        const chefData = await chefResponse.json();
+
+        if (recetasData.recetas && criticosData.food_rev && usersData.users) {
+            // Filtrar los críticos
+            const criticUserIds = criticosData.food_rev
+                .filter(critico => critico.TipoCritico === "Critico")
+                .map(critico => critico.ID_User);
+
+            // Crear un mapa de chefs con su imagen
+            const chefsMap = new Map();
+            // usersData.users.forEach(user => {
+            //     if (user.TipoUsuario === "Chef Profesional" || user.TipoUsuario === "Chef Aficionado") {
+            //         chefsMap.set(user.ID_User, user.imagen); // Mapeamos el ID de usuario a la imagen
+            //     }
+            // });
+            // Crear un mapa para almacenar el puntaje total de cada chef
+            const chefScores = new Map();
+            
+            chefData.chefs.forEach(chef => {
+                    chefsMap.set(chef.ID_Chef, usersData.users.find(u=> u.ID_User==chef.ID_User).imagen); // Mapeamos el ID de usuario a la imagen
+                    chefScores.set(chef.ID_Chef, { totalScore: 0, recipeCount: 0 });
+            });
+            console.log('Mapa de chefs:', chefsMap); // Verifica el contenido del mapa
+
+
+
+            
+
+            // Inicializar el puntaje de todos los chefs con 0
+            // usersData.users.forEach(user => {
+            //     if (user.TipoUsuario === "Chef Profesional" || user.TipoUsuario === "Chef Aficionado") {
+            //         chefScores.set(user.ID_User, { totalScore: 0, recipeCount: 0 });
+            //     }
+            // });
+
+            // Procesar las recetas y calcular el puntaje de cada chef
+            recetasData.recetas.forEach(receta => {
+                const chefId = receta.ID_Chef;
+
+                // Asegurarnos de que el chef está en el mapa de puntuaciones
+                if (!chefScores.has(chefId)) {
+                    chefScores.set(chefId, { totalScore: 0, recipeCount: 0 });
+                }
+
+                // Filtrar las calificaciones de los críticos
+                const ratingsCriticos = receta.Rating.filter(rating => criticUserIds.includes(rating.ID_User));
+
+                // Si hay calificaciones de críticos, calcular el promedio
+                if (ratingsCriticos.length > 0) {
+                    const totalCalificaciones = ratingsCriticos.reduce((total, rating) => total + rating.Calificacion, 0);
+                    const promedio = totalCalificaciones / ratingsCriticos.length;
+
+                    // Asociar el puntaje de la receta al chef
+                    const chefData = chefScores.get(chefId);
+                    chefData.totalScore += promedio; // Sumar el promedio de calificación
+                    chefData.recipeCount += 1; // Contar las recetas del chef
+                }
+            });
+
+            // Crear un ranking de chefs basado en el puntaje total
+            const sortedChefs = [...chefScores.entries()]
+                .map(([chefId, { totalScore, recipeCount }]) => ({
+                    chefId,
+                    averageScore: recipeCount > 0 ? totalScore / recipeCount : 0 // Promedio de todas las recetas del chef
+                }))
+                .sort((a, b) => b.averageScore - a.averageScore); // Ordenar de mayor a menor
+
+            // Mostrar el ranking de chefs con sus imágenes
+            displayChefRanking(sortedChefs, chefsMap);
+        } else {
+            console.error('Error al obtener datos desde las APIs.');
+        }
+    } catch (error) {
+        console.error('Error al comunicarse con el backend:', error);
+    }
+});
+
+// Función para mostrar el ranking de chefs con la imagen
+const displayChefRanking = (ranking, chefsMap) => {
+    const podium = document.querySelector('.podium');
+    podium.innerHTML = ''; // Limpiar el contenido existente
+
+    const podiumPositions = ['Primer Lugar', 'Segundo Lugar', 'Tercer Lugar'];
+    const podiumClasses = ['podium-first', 'podium-second', 'podium-third'];
+
+    // Iterar sobre los tres mejores chefs
+    ranking.slice(0, 3).forEach((chef, index) => {
+        // Crear la tarjeta del chef
+        const chefCard = document.createElement('div');
+        chefCard.classList.add('chef-card', podiumClasses[index]); // Usar el índice actual para el estilo
+
+        // Obtener la imagen del chef
+        const chefImage = chefsMap.get(chef.chefId) || 'default.jpg';
+        const imagePath = `http://25.61.139.76:3000/img/userIcons/${chefImage}`;
+
+        // Crear la sección de imagen
+        const imageDiv = document.createElement('div');
+        imageDiv.classList.add('chef-carousel-images');
+
+        const img = document.createElement('img');
+        img.src = imagePath;
+        img.alt = `Chef ${chef.chefId}`;
+        img.onerror = () => {
+            img.src = 'http://25.61.139.76:3000/img/userIcons/default.jpg';
+        };
+
+        imageDiv.appendChild(img);
+
+        // Crear la sección de nombre debajo de la imagen
+        const nameDiv = document.createElement('div');
+        nameDiv.classList.add('chef-text-below');
+        nameDiv.textContent = `Chef ${chef.chefId}`; // Cambiar por el nombre si está disponible
+
+        // Crear la etiqueta de posición
+        const positionLabel = document.createElement('div');
+        positionLabel.classList.add('position-label');
+        positionLabel.textContent = podiumPositions[index]; // "Primer Lugar", etc.
+
+        // Crear la sección de estadísticas
+        const statsDiv = document.createElement('div');
+        statsDiv.classList.add('chef-stats');
+        statsDiv.innerHTML = `
+            <div class="total-score">Puntuación Promedio: ${chef.averageScore.toFixed(2)}</div>
+        `;
+
+        // Ensamblar la tarjeta
+        chefCard.appendChild(imageDiv);
+        chefCard.appendChild(nameDiv);
+        chefCard.appendChild(positionLabel);
+        chefCard.appendChild(statsDiv);
+        podium.appendChild(chefCard);
+    });
+
+    // Validar si no hay datos en el ranking
+    if (ranking.length === 0) {
+        const noDataDiv = document.createElement('div');
+        noDataDiv.textContent = 'No hay chefs para mostrar en el ranking.';
+        podium.appendChild(noDataDiv);
+    }
 };
