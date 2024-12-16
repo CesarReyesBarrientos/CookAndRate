@@ -502,12 +502,10 @@ document.addEventListener('click', (event) => {
     if (event.target.classList.contains('follow')) {
         const user = userResult.ID_User;
         const chef = userid;
-        // console.log(userResult.ID_User+" siguio a "+userid);
         if (userResult.TipoUsuario === "Critico" || userResult.TipoUsuario === "Consumidor") {
             console.log("Critico "+user+" siguio a chef "+chef);
         }else if (userResult.TipoUsuario === "Chef Aficionado" || userResult.TipoUsuario === "Chef Profesional"){
             console.log("Chef "+user+" siguio a chef "+chef);
         }
-        
     }
 });
