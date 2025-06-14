@@ -363,7 +363,7 @@ i{
     height: 40px;
     text-align: center;
     font-size: 17px;
-    border: 1px solid #464646;
+    /* border: 1px solid #464646; */
     border-radius: 5px;
 }
 .rating[type="number"] {

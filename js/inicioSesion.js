@@ -15,32 +15,50 @@ async function validateUserData(email, password) {
     const emailError = document.getElementById('emailError');
 
     try {
-        const response = await fetch(`http://192.168.50.209:3000/login?Email=${email}&password=${password}`);
+        const response = await fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        });
+
         const data = await response.json();
 
-        if (data.message === "COI") {
-            passwdError_1.textContent = 'Las constraseña es incorrecta';
+        // Ocultar errores inicialmente
+        passwdError_1.style.display = 'none';
+        emailError.style.display = 'none';
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Error en la solicitud');
+        }
+
+        // Verificar códigos de respuesta
+        if (data.message === 'COI') {
+            passwdError_1.textContent = 'La contraseña es incorrecta';
             passwdError_1.style.display = 'block';
-            emailError.textContent = '';
-            emailError.style.display = 'none';
-        } else if (data.message === "UNE") {
+        } else if (data.message === 'UNE') {
             emailError.textContent = 'El correo no existe';
             emailError.style.display = 'block';
-            passwdError_1.textContent = '';
-            passwdError_1.style.display = 'none';
-        }else if (data.message === "ACC") {
-            console.log(data.message);
-            passwdError_1.textContent = '';
-            passwdError_1.style.display = 'none';
-            emailError.textContent = '';
-            emailError.style.display = 'none';
-            // Logica para redirigir
+        } else if (data.message === 'ACC') {
+            // Redirigir si hay token
             if (data.token) {
                 localStorage.setItem('authToken', data.token);
+                // Guardar también los datos del usuario si los necesitas
+                if (data.user) {
+                    localStorage.setItem('userData', JSON.stringify(data.user));
+                }
+                console.log('Inicio de sesión exitoso:', data);
                 window.location.href = 'paginaprin.html';
             }
         }
     } catch (error) {
-        alert(error.message);
+        console.error('Error:', error);
+        // Mostrar error genérico si falla la conexión
+        passwdError_1.textContent = 'Error al conectar con el servidor';
+        passwdError_1.style.display = 'block';
     }
-} 
+}

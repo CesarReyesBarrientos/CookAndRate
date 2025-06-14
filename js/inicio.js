@@ -7,46 +7,7 @@ let chefResult;
 let recetasChefResult; 
 let foodRResult;
 let recetasPagina;
-
-function generarAnuncios(anuncios) {
-    const container = document.querySelector('.publicidad-container');
-    container.innerHTML = '';
-    // Mezcla el array de anuncios aleatoriamente (Algoritmo de Fisher-Yates)
-    const anunciosAleatorios = anuncios.sort(() => Math.random() - 0.5);
-    // Selecciona solo los primeros 5 anuncios aleatorios
-    const anunciosLimitados = anunciosAleatorios.slice(0, 5);
-    anunciosLimitados.forEach(anuncio => {
-        const anuncioDiv = document.createElement('div');
-        anuncioDiv.classList.add('publicidad');
-        anuncioDiv.innerHTML = `
-            <div class="containerColumn">
-                <div class="containerRow">
-                    <div class="containerColumn">
-                        <div><a href="#" target="_blank"><img class="imgPubli" src="${anuncio.ImagenPerfil}" alt=""></a></div>
-                    </div>
-                    <div class="containerColumn">
-                        <div class="main-text">${anuncio.Titulo}</div>
-                        <div class="subtext">${anuncio.NombrePromocionador}</div>
-                    </div>
-                </div>
-                <div>
-                    <p class="contenido">${anuncio.Contenido}</p>
-                </div>
-            </div>
-
-            <div class="carousel">
-                <button class="btn left">&lt;</button>
-                <div class="carousel-images">
-                    ${anuncio.Imagenes.map(imgUrl => `<img src="${imgUrl}" alt="Imagen de receta">`).join('')}
-                </div>
-                <button class="btn right">&gt;</button>
-            </div>
-        `;
-        container.appendChild(anuncioDiv);
-        // Configura el carrusel de este anuncio
-        setupCarousel(anuncioDiv.querySelector('.carousel'));
-    });
-}
+let iconResult;
 
 // Configuración del carrusel
 function setupCarousel(carousel) {
@@ -105,12 +66,6 @@ window.onload = () => {
     } else {
         getUserData(token)
             .then(() => {
-                // Aquí puedes usar las variables
-                // console.log('User Result:', userResult);
-                // console.log('Chef Result:', chefResult);
-                // console.log('Recetas Chef:', recetasChefResult);
-                // console.log('Food R Result:', foodRResult);
-                
                 updateUserInterface();
             })
             .catch(error => {
@@ -168,6 +123,7 @@ const getChefData = async (userId) => {
     }
 };
 
+// Funcionalidad nueva aplicada para obtener los datos del usuario
 const getUserData = (token) => {
     return new Promise((resolve, reject) => {
         const userData = parseJWT(token);
@@ -175,27 +131,36 @@ const getUserData = (token) => {
             //console.log('Datos del usuario', userData.userId);
             const data = {};
             data.userId = userData.userId;
-            fetch('http://192.168.50.209:3000/find-user-by-id', {
+            fetch('http://localhost:3000/find-user-by-id', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify({ userId: userData.userId }),
             })
             .then((response) => response.json())
             .then((result) => {
+                console.log('Datos usuario:', result.user);
+                // console.log('Imagen de usuario:', result.icon);
                 userResult = result.user;
+                iconResult = result.icon;
                 if (result.chef) {
-                    chefResult = result.chef;
-                    recetasChefResult = result.recetas;
-                } else {
-                    foodRResult = result.foodr;
+                    const chefResult = result.chef;
+                    console.log('Datos chef:', chefResult);
+                    console.log('Recetas del chef:', chefResult.recetas);
+                    // Hacer algo con los datos del chef
+                } else if (result.critico) {
+                    const foodRResult = result.critico;
+                    console.log('Datos crítico:', foodRResult);
+                    // Hacer algo con los datos del crítico
                 }
+                
+                // Guardar en localStorage si es necesario
+                localStorage.setItem('userData', JSON.stringify(result));
                 resolve();
             })
             .catch((error) => {
-                console.error(error);
-                reject(error);
+                console.error('Error:', error);
             });
         } else {
             console.error('Token inválido.');
@@ -204,18 +169,18 @@ const getUserData = (token) => {
     });
 };
 
+// Funcionalidad nueva aplicada para obtener los datos del usuario
 function updateUserInterface() {
     // Función para actualizar la interfaz con los datos cargados
     if (userResult) {
-        // Ejemplo: actualizar nombre de usuario
         const userNameElement = document.getElementById('userName');
         if (userNameElement) {
-            userNameElement.textContent = userResult.Nombre + " " + userResult.ApellidoP + " " + userResult.ApellidoM;
+            userNameElement.textContent = userResult.Nombre + " " + userResult.Ape_Pat + " " + userResult.Ape_Mat;
         }
-        
         // Ejemplo: actualizar imagen de perfil
-        if (userResult.imagen) {
-            const userImage = `http://192.168.50.209:3000${userResult.imagen}`;
+        if (iconResult) {
+            const userImage = `${iconResult}`;
+            console.log(`${iconResult}`);
             const userIconElement = document.getElementById('userIcon');
             if (userIconElement) {
                 userIconElement.src = userImage;
@@ -694,29 +659,52 @@ const enviarIcon = document.querySelector('.enviar_');
 const ratingSelect = document.querySelector('.rating');
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('http://192.168.50.209:3000/top-3-recetas')
-        .then(response => response.json())
+    const chefsContainer = document.querySelector('.chefs');
+    const rankingDiv = document.querySelector('.ranking p');
+    
+    // Mostrar estado de carga
+    chefsContainer.innerHTML = '<div class="loading">Cargando mejores platillos...</div>';
+    
+    fetch('http://localhost:3000/top-3-recetas')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
-            const chefsContainer = document.querySelector('.chefs');
-            
-            // Limpiar el contenedor actual
-            chefsContainer.innerHTML = '';
+            if (!data.success || !data.top3Recetas) {
+                throw new Error('Datos de recetas no disponibles');
+            }
 
-            // Modificar el título
-            const rankingDiv = document.querySelector('.ranking p');
+            // Limpiar contenedor
+            chefsContainer.innerHTML = '';
+            
+            // Actualizar título
             rankingDiv.textContent = 'RANKING DE MEJORES PLATILLOS';
-            // Crear tarjetas para los mejores platillos
-            data.top3Recetas.forEach(receta => {
+
+            // Crear tarjetas para cada receta
+            // console.log(data.top3Recetas);
+            data.top3Recetas.forEach((receta, index) => {
+                console.log(receta);
                 const chefCard = document.createElement('div');
                 chefCard.className = 'chef-card';
-                
                 chefCard.innerHTML = `
+                    <div class="ranking-badge">Top ${index + 1}</div>
                     <div class="chef-carousel">
                         <div class="chef-carousel-images">
-                            <img src='http://192.168.50.209:3000/img/recetas/${receta.Imagen}' alt="${receta.Nombre}">
+                            <img src="http://localhost:3000/img/recetas/${receta.Imagen}" 
+                                 alt="${receta.Nombre}">
                         </div>
                     </div>
-                    <div class="chef-text-below">${receta.Nombre.toUpperCase()}</div>
+                    <div class="chef-text-below">
+                        <h3>${receta.Nombre.toUpperCase()}</h3>
+                        <p class="chef-name">Por: ${receta.Chef_Nombre} ${receta.Chef_Apellido}</p>
+                        <div class="rating">
+                            <span class="stars">${'★'.repeat(Math.round(receta.Puntuacion_Promedio || 0))}</span>
+                            <span>(${receta.Puntuacion_Promedio || 'N/A'})</span>
+                        </div>
+                    </div>
                 `;
                 
                 chefsContainer.appendChild(chefCard);
@@ -724,11 +712,11 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => {
             console.error('Error al cargar los mejores platillos:', error);
-            
-            const chefsContainer = document.querySelector('.chefs');
             chefsContainer.innerHTML = `
                 <div class="error-message">
-                    No se pudieron cargar los mejores platillos. Intente nuevamente más tarde.
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>No se pudieron cargar los mejores platillos.</p>
+                    <button onclick="window.location.reload()">Reintentar</button>
                 </div>
             `;
         });
