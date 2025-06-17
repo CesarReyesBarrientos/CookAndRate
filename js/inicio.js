@@ -684,25 +684,42 @@ document.addEventListener('DOMContentLoaded', () => {
             rankingDiv.textContent = 'RANKING DE MEJORES PLATILLOS';
 
             // Crear tarjetas para cada receta
-            // console.log(data.top3Recetas);
+            console.log(data.top3Recetas);
             data.top3Recetas.forEach((receta, index) => {
+                // Declarar todas las variables al inicio
+                let puntuacionNumerica = 0;
+                let puntuacionFormateada = 'N/A';
+                
+                // Convertir a número si existe
+                if (receta.Puntuacion_Promedio !== null && receta.Puntuacion_Promedio !== undefined) {
+                    puntuacionNumerica = parseFloat(receta.Puntuacion_Promedio);
+                    if (!isNaN(puntuacionNumerica)) {
+                        puntuacionFormateada = puntuacionNumerica.toFixed(2);
+                    }
+                }
+                
+                const porcentajeLlenado = (puntuacionNumerica / 5) * 100;
                 console.log(receta);
+                
                 const chefCard = document.createElement('div');
                 chefCard.className = 'chef-card';
+                
                 chefCard.innerHTML = `
                     <div class="ranking-badge">Top ${index + 1}</div>
+                    <div class="ranking-badge">${receta.Nombre}</div>
                     <div class="chef-carousel">
                         <div class="chef-carousel-images">
-                            <img src="http://localhost:3000/img/recetas/${receta.Imagen}" 
-                                 alt="${receta.Nombre}">
+                            <img src="${receta.Imagen}" alt="${receta.Nombre}">
                         </div>
                     </div>
                     <div class="chef-text-below">
-                        <h3>${receta.Nombre.toUpperCase()}</h3>
                         <p class="chef-name">Por: ${receta.Chef_Nombre} ${receta.Chef_Apellido}</p>
                         <div class="rating">
-                            <span class="stars">${'★'.repeat(Math.round(receta.Puntuacion_Promedio || 0))}</span>
-                            <span>(${receta.Puntuacion_Promedio || 'N/A'})</span>
+                            <div class="stars-container">
+                                <div class="stars-background">★★★★★</div>
+                                <div class="stars-filled" style="width: ${porcentajeLlenado}%">★★★★★</div>
+                            </div>
+                            <span class="rating-value">(${puntuacionFormateada})</span>
                         </div>
                     </div>
                 `;

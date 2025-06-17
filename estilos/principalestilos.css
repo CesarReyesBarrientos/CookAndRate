@@ -16,42 +16,183 @@ body {
     justify-content: space-evenly;
     align-items: flex-start;
     padding: 20px;
-}
-
-.chef-card {
-    width: 350px; 
-    background-color: #f8f8f8;
     border: 1px solid #ccc;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    text-align: center;
-    position: relative;
 }
 
+/* Rating system - Versión recomendada */
+
+.stars {
+  --rating: 0;
+  --percent: calc(var(--rating) / 5 * 100%);
+  position: relative;
+  display: inline-block;
+  font-size: 18px;
+  font-family: Times;
+  line-height: 1;
+  padding: 10px 0;
+}
+
+.stars::before {
+  content: '★★★★★';
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #FFD700 var(--percent), rgba(0,0,0,0.1) var(--percent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Sistema de estrellas completo */
+.rating {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  /* border: 1px solid #ccc; */
+   padding: 0 10px;
+  width: 100%;
+}
+
+.stars-container {
+  position: relative;
+  display: inline-block;
+  font-size: 20px;
+  line-height: 1;
+  width: auto;
+  /* border: 1px solid #917171; */
+}
+
+.stars-background,
+.stars-filled {
+  font-family: Times, serif;
+  letter-spacing: 2px;
+}
+
+.stars-background {
+  color: #e0e0e0; /* Color estrellas vacías */
+  letter-spacing: 2px;
+}
+
+.stars-filled {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  color: #FFD700; /* Color estrellas llenas */
+  letter-spacing: 2px;
+  width: 0; /* Se ajustará dinámicamente */
+}
+
+.rating-value {
+  color: #777;
+  font-size: 16px;
+  font-weight: bold;
+  /* border: 1px solid #917171; */
+}
+
+/* Estilos generales para las cards */
+.chef-card {
+  position: relative;
+  width: 400px;
+  margin: 20px;
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.chef-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Badge de ranking */
+.ranking-badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: linear-gradient(135deg, #ff8a00, #e52e71);
+  color: white;
+  padding: 5px 12px;
+  margin: 0 2px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 14px;
+  z-index: 2;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.ranking-badge:nth-of-type(2) {
+  top: 45px;
+  margin-top: 3px;
+  background: linear-gradient(135deg, #4e54c8, #8f94fb);
+}
+
+/* Contenedor de la imagen */
 .chef-carousel {
-    position: relative;
-    overflow: hidden; /* Asegura que solo se vean las imágenes dentro del contenedor */
-    height: 400px;
+  height: 250px;
+  overflow: hidden;
 }
 
-.chef-carousel-images {
-    display: flex;
-    width: 300%; /* Ancho total del contenedor para 3 imágenes */
-    transition: transform 0.5s ease-in-out;
+.chef-carousel-images img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
 }
 
-.chef-carousel img {
-    width: 33.33%; /* Cada imagen ocupa un 33.33% del contenedor */
-    height: 400px;
-    object-fit: cover;
+.chef-card:hover .chef-carousel-images img {
+  transform: scale(1.05);
 }
 
+/* Contenido textual */
 .chef-text-below {
-    padding: 15px; 
-    font-size: 16px;
-    color: #333;
-    text-align: left; 
+  padding: 10px;
+  text-align: left;
+}
+
+.chef-text-below h3 {
+  margin: 0;
+  text-align: center;
+  color: #333;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-style: bold;
+}
+
+.chef-name {
+  color: #666;
+  font-size: 14px;
+  margin: 5px 0 0 0;
+  font-style: italic;
+  padding: 0 10px;
+  /* border: 1px solid #ccc; */
+}
+
+/* Estilos para la valoración */
+
+
+
+.rating span:last-child {
+  color: #777;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Efectos especiales para los top 3 */
+.chef-card:nth-child(1) .ranking-badge:first-child {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+}
+
+.chef-card:nth-child(2) .ranking-badge:first-child {
+  background: linear-gradient(135deg, #C0C0C0, #A9A9A9);
+}
+
+.chef-card:nth-child(3) .ranking-badge:first-child {
+  background: linear-gradient(135deg, #CD7F32, #A67C52);
 }
 
 /* Estilos para la publicidad */
@@ -211,6 +352,7 @@ body {
     box-shadow: none;
     padding: 20px;
     transition: box-shadow 0.3s ease-in-out;
+    box-shadow: 0 4px 6px #ccc;
 }
 .header.scrolled {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -227,12 +369,14 @@ body {
 }
 .titulo {
     font-size: 60px;
+    padding: 0;
     margin: 0; 
     font-family: "Noto Serif Ahom", serif;
 }
 .subtitulo {
     font-size: 20px;
     margin: 0; 
+    padding: 0;
     color: gray; 
     font-family: "Noto Serif Ahom", serif;
 }
