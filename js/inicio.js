@@ -9,6 +9,8 @@ let foodRResult;
 let recetasPagina;
 let iconResult;
 
+let recetasHome;
+
 // Configuración del carrusel
 function setupCarousel(carousel) {
     const imagesContainer = carousel.querySelector('.carousel-images');
@@ -77,18 +79,19 @@ window.onload = () => {
 
 const getRecetas = async () => {
     try {
-        const response = await fetch('http://192.168.50.209:3000/read-recetas');
+        const response = await fetch('http://localhost:3000/read-recetas');
         if (response.ok) {
             const data = await response.json();
-            //console.log(data);
+            recetasHome = data.recetas;
+            generarPublicaciones();
         } else {
             console.error('Error en la respuesta:', response.statusText);
         }
+
     } catch (error) {
         console.error('Error en la solicitud:', error.message);
     }
 };
-
 
 const parseJWT = (token) => {
     try {
@@ -128,7 +131,6 @@ const getUserData = (token) => {
     return new Promise((resolve, reject) => {
         const userData = parseJWT(token);
         if (userData) {
-            //console.log('Datos del usuario', userData.userId);
             const data = {};
             data.userId = userData.userId;
             fetch('http://localhost:3000/find-user-by-id', {
@@ -140,18 +142,19 @@ const getUserData = (token) => {
             })
             .then((response) => response.json())
             .then((result) => {
-                console.log('Datos usuario:', result.user);
+                // console.log('User Data', result);
+                // console.log('Datos usuario:', result.user);
                 // console.log('Imagen de usuario:', result.icon);
                 userResult = result.user;
                 iconResult = result.icon;
                 if (result.chef) {
                     const chefResult = result.chef;
-                    console.log('Datos chef:', chefResult);
-                    console.log('Recetas del chef:', chefResult.recetas);
+                    // console.log('Datos chef:', chefResult);
+                    // console.log('Recetas del chef:', chefResult.recetas);
                     // Hacer algo con los datos del chef
                 } else if (result.critico) {
                     const foodRResult = result.critico;
-                    console.log('Datos crítico:', foodRResult);
+                    // console.log('Datos crítico:', foodRResult);
                     // Hacer algo con los datos del crítico
                 }
                 
@@ -180,7 +183,7 @@ function updateUserInterface() {
         // Ejemplo: actualizar imagen de perfil
         if (iconResult) {
             const userImage = `${iconResult}`;
-            console.log(`${iconResult}`);
+            // console.log(`${iconResult}`);
             const userIconElement = document.getElementById('userIcon');
             if (userIconElement) {
                 userIconElement.src = userImage;
@@ -188,23 +191,68 @@ function updateUserInterface() {
         }
     }
 }
-  
-function generarPublicaciones(recetas, chefs, users) {
+
+async function generarPublicaciones() {
     const publicacionesContainer = document.querySelector('.publicaciones');
     publicacionesContainer.innerHTML = ''; 
-    const recetasAleatorios = recetas.sort(() => Math.random() - 0.5);
-    // Limitar a las primeras 10 recetas
-    // const recetasLimitadas = recetas.slice(0, );
 
-    recetasAleatorios.forEach(receta => {
-        // Encontrar al chef correspondiente
-        const chef = chefs.find(c => c.Id_Chef === receta.Id_Chef);
-        const user = chef ? users.find(u => u.ID_User === chef.ID_User) : null;
+    // Usamos for...of en lugar de forEach para poder usar await
+    for (const receta of recetasHome) {
+        // console.log('Receta:', receta);
+        // Accedemos directamente a los datos del chef desde la receta
+        const chefImage = receta.chef.imagen 
+            ? `http://localhost:3000/img/userIcons/${receta.chef.imagen}`
+            : 'http://localhost:3000/img/userIcons/cheficon.jpg';
 
-        const chefImage = user
-            ? `http://192.168.50.209:3000/img/userIcons/${user.imagen}`
-            : 'http://192.168.50.209:3000/img/userIcons/default.png';
-        const chefName = user ? `${user.Nombre} ${user.ApellidoP}` : 'Chef Desconocido';
+        const chefName = receta.chef.nombreCompleto || `${receta.chef.nombre} ${receta.chef.apellidoPaterno}` || 'Chef Desconocido';
+        
+        // Obtenemos las interacciones (totales y del usuario actual)
+        const interaccionReceta = await obtenerInteracciones(receta.id) || {
+            meEncanta: 0,
+            meGusta: 0,
+            noMeGusta: 0,
+            usuarios: [] // Esto es un array
+        };
+
+        
+        
+        // Para encontrar al usuario actual (si está logueado)
+        if (userResult?.ID_Usuario) {
+            const miInteraccion = interaccionReceta.usuarios.find(
+                u => u.userId === userResult.ID_Usuario
+            );
+
+            
+        }
+        const getIconState = (tipo) => {
+            // Verificar si hay usuario logueado
+            if (!userResult?.ID_Usuario) {
+                return {
+                    class: 'fa-regular',
+                    color: '#000000'
+                };
+            }
+
+            // Buscar si el usuario actual tiene una interacción de este tipo en esta receta
+            const usuarioInteraccion = interaccionReceta.usuarios.find(
+                u => u.userId === userResult.ID_Usuario && u.Tipo === tipo
+            );
+
+            if (usuarioInteraccion) {
+                return {
+                    class: 'fa-solid',
+                    color: tipo === 'Me encanta' ? '#ff0000' : '#11306f'
+                };
+            }
+            
+            return {
+                class: 'fa-regular',
+                color: '#000000'
+            };
+        };
+
+        
+
         const publicacion = document.createElement('div');
         publicacion.classList.add('publicacion');
 
@@ -215,31 +263,193 @@ function generarPublicaciones(recetas, chefs, users) {
                         <div><a href="#" target="_blank"><img class="imgPubli" src="${chefImage}" alt="Foto de perfil"></a></div>
                     </div>
                     <div class="containerColumn">
-                        <div class="main-text">${receta.Titulo_Receta}</div>
+                        <div class="main-text">${receta.titulo}</div>
                         <div class="subtext">${chefName}</div>
                     </div>
                 </div>
                 <div>
                     <strong class="contenido">Ingredientes:</strong><br>
-                    ${Object.entries(receta.Ingredientes).map(([key, value]) => `&nbsp;&nbsp;${key}: ${value}<br>`).join('')}
+                    ${Object.entries(receta.ingredientes).map(([ingrediente, cantidad]) => 
+                        `&nbsp;&nbsp;${ingrediente}: ${cantidad}<br>`).join('')}
                     <br>
                     <strong class="contenido">¡A cocinar!</strong><br>
-                    ${receta.Pasos_Elaboracion.map((paso, i) => `&nbsp;&nbsp;${i + 1}. ${paso}<br>`).join('')}
+                    ${receta.pasos.map((paso, index) => 
+                        `&nbsp;&nbsp;${index + 1}. ${paso}<br>`).join('')}
                 </div>
             </div>
             <div class="carousel">
                 <button class="btn left">&lt;</button>
                 <div class="carousel-images">
-                    ${receta.Imagenes.map(imgUrl => `<img src="${imgUrl}" alt="Imagen de receta">`).join('')}
+                    ${receta.imagenes.map(imgUrl => 
+                        `<img src="${imgUrl}" alt="Imagen de receta">`).join('')}
                 </div>
                 <button class="btn right">&gt;</button>
             </div>
+            <!-- Sección de interacciones -->
+                <div class="interacciones-container">
+                <div class="interaccion" data-tipo="meEncanta" data-receta-id="${receta.id}">
+                    <i class="${getIconState('Me encanta').class} fa-heart" style="color: ${getIconState('Me encanta').color}"></i>
+                    <span class="contador">${interaccionReceta.meEncanta ?? 0}</span>
+                </div>
+                <div class="interaccion" data-tipo="meGusta" data-receta-id="${receta.id}">
+                    <i class="${getIconState('Me gusta').class} fa-thumbs-up" style="color: ${getIconState('Me gusta').color}"></i>
+                    <span class="contador">${interaccionReceta.meGusta ?? 0}</span>
+                </div>
+                <div class="interaccion" data-tipo="noMeGusta" data-receta-id="${receta.id}">
+                    <i class="${getIconState('No me gusta').class} fa-thumbs-down" style="color: ${getIconState('No me gusta').color}"></i>
+                    <span class="contador">${interaccionReceta.noMeGusta ?? 0}</span>
+                </div>
+            </div>
         `;
+        
         publicacionesContainer.appendChild(publicacion);
-
         setupCarousel(publicacion.querySelector('.carousel'));
+
+        // Solo agregar eventos si hay usuario logueado
+        if (userResult?.ID_Usuario) {
+            agregarEventosInteraccion(publicacion, receta.id);
+        } else {
+            // Mostrar tooltip o mensaje si no está logueado
+            publicacion.querySelectorAll('.interaccion').forEach(interaccion => {
+                interaccion.style.cursor = 'not-allowed';
+                interaccion.title = 'Inicia sesión para interactuar';
+            });
+        }
+    }
+}
+
+// Función para obtener interacciones (debe incluir la interacción del usuario)
+async function obtenerInteracciones(recetaId) {
+    try {
+        const url = userResult?.ID_Usuario 
+            ? `http://localhost:3000/get-interacciones/${recetaId}?usuarioId=${userResult.ID_Usuario}`
+            : `http://localhost:3000/get-interacciones/${recetaId}`;
+            
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success) {
+            return {
+                meEncanta: data.interacciones.meEncanta || 0, // Nota: viene de interacciones
+                meGusta: data.interacciones.meGusta || 0,     // Nota: viene de interacciones
+                noMeGusta: data.interacciones.noMeGusta || 0,  // Nota: viene de interacciones
+                usuarios: data.interacciones.usuarios || []     // Ahora correctamente anidado
+            };
+        }
+        return {
+            meEncanta: 0,
+            meGusta: 0,
+            noMeGusta: 0,
+            usuarios: []
+        };
+    } catch (error) {
+        console.error('Error al obtener interacciones:', error);
+        return {
+            meEncanta: 0,
+            meGusta: 0,
+            noMeGusta: 0,
+            usuarios: []
+        };
+    }
+}
+
+
+
+function agregarEventosInteraccion(publicacion, recetaId) {
+    const interacciones = publicacion.querySelectorAll('.interaccion');
+    
+    interacciones.forEach(interaccion => {
+        interaccion.addEventListener('click', async function() {
+            const tipo = this.dataset.tipo;
+            const icono = this.querySelector('i');
+            const contador = this.querySelector('.contador');
+            
+            // Guardar estado anterior para posible rollback
+            const estadoAnterior = {
+                clase: icono.className,
+                color: icono.style.color,
+                contador: contador.textContent
+            };
+            
+            // Cambio visual inmediato (optimistic UI)
+            const isActive = icono.classList.contains('fa-solid');
+            icono.classList.toggle('fa-regular');
+            icono.classList.toggle('fa-solid');
+            
+            // Aplicar colores según el tipo de interacción
+            if (icono.classList.contains('fa-solid')) {
+                // Icono activo
+                if (tipo === 'meEncanta') {
+                    icono.style.color = '#ff0000'; // Rojo para "Me encanta"
+                } else {
+                    icono.style.color = '#11306f'; // Azul para "Me gusta" y "No me gusta"
+                }
+            } else {
+                // Icono inactivo
+                icono.style.color = '#000000'; // Negro para todos cuando están inactivos
+            }
+            
+            try {
+                // Registrar la interacción en el servidor
+                const response = await fetch('http://localhost:3000/get-interacciones', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        recetaId: recetaId,
+                        tipo: tipo,
+                        usuarioId: userResult.ID_Usuario
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Actualizar todos los contadores y estados
+                    publicacion.querySelectorAll('.interaccion').forEach(item => {
+                        const tipoItem = item.dataset.tipo;
+                        const iconoItem = item.querySelector('i');
+                        const contadorItem = item.querySelector('.contador');
+                        
+                        // Actualizar contador
+                        contadorItem.textContent = data.nuevoTotal[tipoItem] || 0;
+                        
+                        // Actualizar estado del icono
+                        if (tipoItem === tipo) {
+                            // Mantener el estado actual del icono clickeado
+                            iconoItem.className = icono.className;
+                            iconoItem.style.color = icono.style.color;
+                        } else {
+                            // Desactivar otras interacciones
+                            iconoItem.classList.remove('fa-solid');
+                            iconoItem.classList.add('fa-regular');
+                            iconoItem.style.color = '#000000';
+                        }
+                    });
+                    
+                    console.log('Interacción actualizada:', {
+                        recetaId,
+                        tipo,
+                        nuevoTotal: data.nuevoTotal
+                    });
+                } else {
+                    // Revertir cambios si falló la respuesta del servidor
+                    icono.className = estadoAnterior.clase;
+                    icono.style.color = estadoAnterior.color;
+                    contador.textContent = estadoAnterior.contador;
+                }
+            } catch (error) {
+                console.error('Error al registrar interacción:', error);
+                // Revertir cambios visuales si hubo error
+                icono.className = estadoAnterior.clase;
+                icono.style.color = estadoAnterior.color;
+                contador.textContent = estadoAnterior.contador;
+            }
+        });
     });
 }
+
 
 const tabs = document.querySelectorAll('.tab');
 const tabContents = document.querySelectorAll('.tab-content');
@@ -253,252 +463,16 @@ tabs.forEach(tab => {
     });
 });
 
-async function fetchCombinedPublications() {
-    try {
-        // Obtener anuncios
-        const anunciosResponse = await fetch('http://192.168.50.209:3000/read-anuncios');
-        const anunciosData = await anunciosResponse.json();
-        const anuncios = anunciosData.anuncios;
-
-        // Obtener recetas
-        const recetasResponse = await fetch('http://192.168.50.209:3000/read-recetas');
-        const recetasData = await recetasResponse.json();
-        const recetas = recetasData.recetas;
-        //console.log(recetas);
-        
-
-        // Obtener chefs
-        const chefsResponse = await fetch('http://192.168.50.209:3000/read-chefs');
-        const chefsData = await chefsResponse.json();
-        const chefs = chefsData.chefs;
-
-        // Obtener usuarios
-        const usersResponse = await fetch('http://192.168.50.209:3000/read-users');
-        const usersData = await usersResponse.json();
-        const users = usersData.users;
-        // console.log(recetas);
-        // Combinar anuncios y recetas
-        const combinedPublications = [
-            ...anuncios.map(anuncio => ({
-                type: 'anuncio',
-                data: anuncio
-            })),
-            ...recetas.map(receta => {
-                // Buscar el chef para esta receta
-                const chef = chefs.find(c => c.ID_Chef === receta.ID_Chef);
-                // console.log(chef);
-                // Buscar el usuario correspondiente al chef
-                const user = chef ? users.find(u => u.ID_User === chef.ID_User) : null;
-                // console.log(user);
-
-                return {
-                    type: 'receta',
-                    data: receta,
-                    chef: chef,
-                    user: user
-                };
-            })
-        ];
-
-        // Mezclar aleatoriamente
-        const randomPublications = combinedPublications.sort(() => Math.random() - 0.5);
-
-        // Limitar a 10 publicaciones
-        const limitedPublications = randomPublications.slice(0, 10);
-
-        // Generar publicaciones
-        generarPublicacionesCombinadas(limitedPublications);
-        setUserInteracts();
-    } catch (error) {
-        console.error('Error al obtener los datos:', error);
-    }
-}
-
-
-function generarPublicacionesCombinadas(publications) {
-    const publicacionesContainer = document.querySelector('.publicaciones');
-    publicacionesContainer.innerHTML = ''; // Limpiar el contenedor
-
-    publications.forEach(publication => {
-        // Crear contenedores para cada publicación
-        const publicacion = document.createElement('div');
-        publicacion.classList.add('publicacion'); // Añadir la clase para la publicación
-        const publicidad = document.createElement('div');
-        publicidad.classList.add('publicidad'); // Añadir la clase para la publicidad
-
-        if (publication.type === 'anuncio') {
-            const anuncio = publication.data;
-            publicidad.innerHTML = `
-                <div class="containerColumn">
-                    <div class="containerRow">
-                        <div class="containerColumn">
-                            <div><a href="#" target="_blank"><img class="imgPubli" src="${anuncio.ImagenPerfil}" alt=""></a></div>
-                        </div>
-                        <div class="containerColumn">
-                            <div class="main-text">${anuncio.Titulo}</div>
-                            <div class="subtext">${anuncio.NombrePromocionador}</div>
-                        </div>
-                    </div>
-                    <div>
-                        <p class="contenido">${anuncio.Contenido}</p>
-                    </div>
-                </div>
-                <div class="carousel">
-                    <button class="btn left">&lt;</button>
-                    <div class="carousel-images">
-                        ${anuncio.Imagenes.map(imgUrl => `<img src="${imgUrl}" alt="Imagen de anuncio">`).join('')}
-                    </div>
-                    <button class="btn right">&gt;</button>
-                </div>
-            `;
-            publicacionesContainer.appendChild(publicidad); // Añadir el anuncio al contenedor de publicidades
-            setTimeout(() => {
-                const carouselElement = publicidad.querySelector('.carousel');
-                if (carouselElement) {
-                    setupCarousel(carouselElement); // Configurar el carrusel
-                }
-            }, 0);
-        } else if (publication.type === 'receta') {
-            const receta = publication.data;
-            const user = publication.user;
-            const chefImage = user
-                ? `http://192.168.50.209:3000/img/userIcons/${user.imagen}`
-                : 'http://192.168.50.209:3000/img/userIcons/default.png';
-            const chefName = user ? `${user.Nombre} ${user.ApellidoP}` : 'Chef Desconocido';
-            publicacion.innerHTML = `
-                <div class="containerColumn">
-                    <div class="containerRow">
-                        <div class="containerColumn">
-                            <div><a><img class="imgPubli Id_User" id="${user.ID_User}" src="${chefImage}" alt="Foto de perfil"></a></div>
-                        </div>
-                        <div class="containerColumn">
-                            <div class="main-text">${receta.Titulo_Receta}</div>
-                            <div class="subtext">${chefName}</div>
-                        </div>
-                    </div>
-                    <div>
-                        <strong class="contenido">Ingredientes:</strong><br>
-                        ${Object.entries(receta.Ingredientes).map(([key, value]) => `&nbsp;&nbsp;${key}: ${value}<br>`).join('')}
-                        <br>
-                        <strong class="contenido">¡A cocinar!</strong><br>
-                        ${receta.Pasos_Elaboracion.map((paso, i) => `&nbsp;&nbsp;${i + 1}. ${paso}<br>`).join('')}
-                    </div>
-                </div>
-                <a class="Id_receta" id="${receta.ID_Receta}">Saber más sobre la receta...</a>
-
-                <div class="carousel">
-                    <button class="btn left">&lt;</button>
-                    <div class="carousel-images">
-                        ${receta.Imagenes.map(imgUrl => `<img src="${imgUrl}" alt="Imagen de receta">`).join('')}
-                    </div>
-                    <button class="btn right">&gt;</button>
-                </div>
-                <div class="parent-div">
-                    <div class="child-div">
-                        <!-- Corazón -->
-                        <i class="fa-regular fa-heart fa-xl icon-off interact" data-receta="${receta.ID_Receta}" id="int-01" style="color: #000000;"></i> 
-                        <i class="fa-solid fa-heart fa-xl icon-on icon-on interact_" id="int-02" data-receta="${receta.ID_Receta}" style="color: #ff0000; display: none;"></i>
-                        <p>Me encanta</p>
-                    </div>
-                    <div class="child-div">
-                        <!-- Like -->
-                        <i class="fa-regular fa-thumbs-up fa-xl icon-off interact" id="int-03" data-receta="${receta.ID_Receta}" style="color: #000000;"></i>
-                        <i class="fa-solid fa-thumbs-up fa-xl icon-on interact_" id="int-04" data-receta="${receta.ID_Receta}" style="color: #11306f; display: none;"></i>
-                        <p>Me gusta</p>
-                    </div>
-                    <div class="child-div">
-                        <!-- Dislike -->
-                        <i class="fa-regular fa-thumbs-down fa-xl icon-off interact" id="int-05" data-receta="${receta.ID_Receta}" style="color: #000000;"></i>
-                        <i class="fa-solid fa-thumbs-down fa-xl icon-on interact_" id="int-06" data-receta="${receta.ID_Receta}" style="color: #11306f; display: none;"></i>
-                        <p>No me gusta</p>
-                    </div>
-
-                    ${chefResult ? '' : `
-                        <div class="child-div last-child" >
-                       <select class="rating">
-                        <option value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        </select>
-
-                        <i data-receta="${receta.ID_Receta}" class="fas fa-star fa-lg enviar_" ></i><p>Calificar</p>
-                    </div>`}
-                </div>
-            `;
-            publicacionesContainer.appendChild(publicacion); // Añadir la receta al contenedor de publicaciones
-            setTimeout(() => {
-                const carouselElement = publicacion.querySelector('.carousel');
-                if (carouselElement) {
-                    setupCarousel(carouselElement); // Configurar el carrusel
-                }
-            }, 0);
-        }
-    });
-}
-
-document.addEventListener('DOMContentLoaded', fetchCombinedPublications);
-
-async function setUserInteracts() {
-    try {
-        // Obtener las recetas desde el servidor
-        const recetasResponse = await fetch('http://192.168.50.209:3000/read-recetas');
-        const recetasData = await recetasResponse.json();
-        const recetas = recetasData.recetas;
-        recetasPagina = recetas;
-
-        // Filtrar las recetas que tienen interacciones del usuario logueado
-        const recetasFiltradas = recetas.filter(receta => 
-            receta.Interacciones.some(interaccion => interaccion.ID_User === userResult.ID_User)
-        );
-        //console.log(recetasFiltradas);
-        // Recorrer todas las recetas filtradas
-        recetasFiltradas.forEach(receta => {
-            // Recorrer las interacciones de cada receta
-            receta.Interacciones.forEach(interaccion => {
-                if (interaccion.ID_User === userResult.ID_User) {
-                    const recetaID = receta.ID_Receta;
-                    const tipoInteraccion = interaccion.Tipo_Interaccion;
-            
-                    // Mapear los tipos de interacción a los íconos
-                    const mapping = {
-                        'Me encanta': { off: 'int-01', on: 'int-02' },
-                        'Me gusta': { off: 'int-03', on: 'int-04' },
-                        'No me gusta': { off: 'int-05', on: 'int-06' }
-                    };
-            
-                    const interaccionIcons = mapping[tipoInteraccion];
-            
-                    if (interaccionIcons) {
-                        // Seleccionar los íconos específicos basados en data-receta
-                        const iconOff = document.querySelector(`i#${interaccionIcons.off}[data-receta="${recetaID}"]`);
-                        const iconOn = document.querySelector(`i#${interaccionIcons.on}[data-receta="${recetaID}"]`);
-            
-                        // Cambiar el estado de visibilidad de los íconos si existen
-                        if (iconOff && iconOn) {
-                            iconOff.style.display = 'none';
-                            iconOn.style.display = 'inline-block';
-                        }
-                    }
-                }
-            });
-        });
-    } catch (error) {
-        console.error('Error al actualizar las interacciones del usuario:', error);
-    }
-}
 
 document.addEventListener('click', (event) => {
     if (event.target.classList.contains('Id_receta')) {
         const recetaId = event.target.id;
-        console.log('El ID de la receta es:', recetaId);
+        // console.log('El ID de la receta es:', recetaId);
         window.open(`nutrition.html?id=${recetaId}`, '_blank');
     }
     if (event.target.classList.contains('Id_User')) {
         const userid = event.target.id;
-        console.log('El ID del usuario:', userid);
+        // console.log('El ID del usuario:', userid);
         if (userid != userResult.ID_User) {
             window.open(`pagina-usuarios.html?id=${userid}`);
         }else {
@@ -511,17 +485,11 @@ document.addEventListener('click', (event) => {
         item.addEventListener('click', registrarInteraccion);
     });
 
-    document.querySelectorAll('.enviar_').forEach(item => {
-        item.addEventListener('click', registrarCalificacion);
-    });
-
     if (event.target.classList.contains('enviar_')) {
         const ratingSelect = event.target.closest('.parent-div').querySelector('.rating');
         const selectedRating = ratingSelect ? ratingSelect.value : null;
-        console.log(`Calificación seleccionada: ${selectedRating}`);
     }
 });
-
 
 function cambiarIconos(iconOff) {
         let iconOn = iconOff.nextElementSibling;
@@ -536,7 +504,7 @@ function cambiarIconos(iconOff) {
                 const dislikeIconOn = document.getElementById('int-06');
                 const dislikeIconOff = document.getElementById('int-05');
                 if (dislikeIconOn && dislikeIconOn.style.display === 'inline-block') {
-                    console.log("Se puso Me gusta y desactivó No me gusta");
+                    // console.log("Se puso Me gusta y desactivó No me gusta");
                     dislikeIconOff.style.display = 'inline-block'; // Se pone OFF el "No me gusta"
                     dislikeIconOn.style.display = 'none';
                 }
@@ -548,7 +516,7 @@ function cambiarIconos(iconOff) {
                 const likeIconOn = document.getElementById('int-04');
                 const likeIconOff = document.getElementById('int-03');
                 if (likeIconOn && likeIconOn.style.display === 'inline-block') {
-                    console.log("Se puso No me gusta y desactivó Me gusta");
+                    // console.log("Se puso No me gusta y desactivó Me gusta");
                     likeIconOff.style.display = 'inline-block'; // Se pone OFF el "Me gusta"
                     likeIconOn.style.display = 'none';
                 }
@@ -602,59 +570,6 @@ function registrarInteraccion(event) {
     }
 }
 
-function actualizarUI() {
-    const ratingValue = document.querySelector('.rating').value;  // Obtener el valor de la calificación
-    const receta = document.querySelector('.rating').getAttribute('data-receta');  // Obtener la receta asociada
-
-    // Mostrar un mensaje de confirmación o actualización de la calificación
-    const mensajeConfirmacion = document.createElement('p');
-    mensajeConfirmacion.textContent = `¡Calificación de ${ratingValue} estrellas enviada correctamente!`;
-    document.body.appendChild(mensajeConfirmacion);
-
-    // Aquí puedes también actualizar el valor visual de la calificación en la UI (por ejemplo, mostrar el puntaje)
-    const recetaElemento = document.querySelector(`[data-receta="${receta}"]`);
-    if (recetaElemento) {
-        // Actualizar el icono o cualquier otro aspecto visual relacionado con la calificación
-        recetaElemento.classList.add('calificado');
-        // Si es necesario, actualizar el texto del puntaje
-        const puntuacionElemento = recetaElemento.querySelector('.puntuacion');
-        if (puntuacionElemento) {
-            puntuacionElemento.textContent = `Calificación: ${ratingValue} estrellas`;
-        }
-    }
-}
-
-
-function registrarCalificacion(event) {
-    if (event.target.classList.contains('enviar_')) {
-        const rating = document.querySelector('.rating').value; // Obtener la calificación seleccionada
-        const receta = event.target.getAttribute('data-receta');  // Obtener la receta asociada
-        console.log(rating);
-        const datos = {
-            idReceta: receta,
-            idUsuario: userResult.ID_User,
-            calificacion: (rating)  // Convertir a entero la calificación
-        };
-
-        // Hacer la solicitud POST para agregar la calificación
-        fetch('http://192.168.50.209:3000/add-rating', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(datos)
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Calificación agregada:', data); // Mostrar la respuesta
-            actualizarUI(); // Función para actualizar la UI (por ejemplo, mostrar la nueva calificación)
-        })
-        .catch(error => {
-            console.error('Error al agregar la calificación:', error);
-        });
-    }
-}
-
 const enviarIcon = document.querySelector('.enviar_');
 const ratingSelect = document.querySelector('.rating');
 
@@ -684,48 +599,48 @@ document.addEventListener('DOMContentLoaded', () => {
             rankingDiv.textContent = 'RANKING DE MEJORES PLATILLOS';
 
             // Crear tarjetas para cada receta
-            console.log(data.top3Recetas);
-            data.top3Recetas.forEach((receta, index) => {
-                // Declarar todas las variables al inicio
-                let puntuacionNumerica = 0;
-                let puntuacionFormateada = 'N/A';
+            // console.log(data.top3Recetas);
+            // data.top3Recetas.forEach((receta, index) => {
+            //     // Declarar todas las variables al inicio
+            //     let puntuacionNumerica = 0;
+            //     let puntuacionFormateada = 'N/A';
                 
-                // Convertir a número si existe
-                if (receta.Puntuacion_Promedio !== null && receta.Puntuacion_Promedio !== undefined) {
-                    puntuacionNumerica = parseFloat(receta.Puntuacion_Promedio);
-                    if (!isNaN(puntuacionNumerica)) {
-                        puntuacionFormateada = puntuacionNumerica.toFixed(2);
-                    }
-                }
+            //     // Convertir a número si existe
+            //     if (receta.Puntuacion_Promedio !== null && receta.Puntuacion_Promedio !== undefined) {
+            //         puntuacionNumerica = parseFloat(receta.Puntuacion_Promedio);
+            //         if (!isNaN(puntuacionNumerica)) {
+            //             puntuacionFormateada = puntuacionNumerica.toFixed(2);
+            //         }
+            //     }
                 
-                const porcentajeLlenado = (puntuacionNumerica / 5) * 100;
-                console.log(receta);
+            //     const porcentajeLlenado = (puntuacionNumerica / 5) * 100;
+            //     // console.log(receta);
                 
-                const chefCard = document.createElement('div');
-                chefCard.className = 'chef-card';
+            //     const chefCard = document.createElement('div');
+            //     chefCard.className = 'chef-card';
                 
-                chefCard.innerHTML = `
-                    <div class="ranking-badge">Top ${index + 1}</div>
-                    <div class="ranking-badge">${receta.Nombre}</div>
-                    <div class="chef-carousel">
-                        <div class="chef-carousel-images">
-                            <img src="${receta.Imagen}" alt="${receta.Nombre}">
-                        </div>
-                    </div>
-                    <div class="chef-text-below">
-                        <p class="chef-name">Por: ${receta.Chef_Nombre} ${receta.Chef_Apellido}</p>
-                        <div class="rating">
-                            <div class="stars-container">
-                                <div class="stars-background">★★★★★</div>
-                                <div class="stars-filled" style="width: ${porcentajeLlenado}%">★★★★★</div>
-                            </div>
-                            <span class="rating-value">(${puntuacionFormateada})</span>
-                        </div>
-                    </div>
-                `;
+            //     chefCard.innerHTML = `
+            //         <div class="ranking-badge">Top ${index + 1}</div>
+            //         <div class="ranking-badge">${receta.Nombre}</div>
+            //         <div class="chef-carousel">
+            //             <div class="chef-carousel-images">
+            //                 <img src="${receta.Imagen}" alt="${receta.Nombre}">
+            //             </div>
+            //         </div>
+            //         <div class="chef-text-below">
+            //             <p class="chef-name">Por: ${receta.Chef_Nombre} ${receta.Chef_Apellido}</p>
+            //             <div class="rating">
+            //                 <div class="stars-container">
+            //                     <div class="stars-background">★★★★★</div>
+            //                     <div class="stars-filled" style="width: ${porcentajeLlenado}%">★★★★★</div>
+            //                 </div>
+            //                 <span class="rating-value">(${puntuacionFormateada})</span>
+            //             </div>
+            //         </div>
+            //     `;
                 
-                chefsContainer.appendChild(chefCard);
-            });
+            //     chefsContainer.appendChild(chefCard);
+            // });
         })
         .catch(error => {
             console.error('Error al cargar los mejores platillos:', error);
