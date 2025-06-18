@@ -65,7 +65,7 @@ async function getUserData(token) {
   const userData = parseJWT(token);
   if (userData) {
     const data = { userId: userData.userId };
-    const response = await fetch('http://localhost:3000/find-user-by-id', {
+    const response = await fetch('http://192.168.50.67:3000/find-user-by-id', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -107,7 +107,7 @@ async function getUserData(token) {
 
 const getRecetas = async (idDeseado) => {  // Añade parámetro para el ID deseado
     try {
-        const response = await fetch('http://localhost:3000/read-recetas');
+        const response = await fetch('http://192.168.50.67:3000/read-recetas');
         if (response.ok) {
             const data = await response.json();
             // Filtra las recetas para obtener solo las que coincidan con el ID deseado
@@ -126,7 +126,7 @@ const getRecetas = async (idDeseado) => {  // Añade parámetro para el ID desea
 
 async function obtenerEstadisticasSeguimiento(userId) {
     try {
-        const response = await fetch(`http://localhost:3000/estadisticas-seguimiento/${userId}`);
+        const response = await fetch(`http://192.168.50.67:3000/estadisticas-seguimiento/${userId}`);
         const data = await response.json();
         
         if (data.success) {
@@ -178,7 +178,7 @@ document.getElementById('edit-form').addEventListener('submit', async (event) =>
   try {
     // 1. Validar email si ha cambiado
     if (email !== originalEmail) {
-      const checkResponse = await fetch('http://localhost:3000/checkEmail', {
+      const checkResponse = await fetch('http://192.168.50.67:3000/checkEmail', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -209,7 +209,7 @@ document.getElementById('edit-form').addEventListener('submit', async (event) =>
       console.log('Subiendo imagen como:', imagenRenombrada);
 
 
-      const uploadResponse = await fetch('http://localhost:3000/api/upload-user-icon', {
+      const uploadResponse = await fetch('http://192.168.50.67:3000/api/upload-user-icon', {
         method: 'POST',
         body: imageForm
       });
@@ -230,7 +230,7 @@ document.getElementById('edit-form').addEventListener('submit', async (event) =>
       biografia: document.getElementById('biografia').value,
       email: email// Usar la URL de la imagen subida o la existente
     };
-    const updateResponse = await fetch('http://localhost:3000/update-user', {
+    const updateResponse = await fetch('http://192.168.50.67:3000/update-user', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updateData)
@@ -247,7 +247,7 @@ document.getElementById('edit-form').addEventListener('submit', async (event) =>
       document.querySelector('.profile-details p:nth-of-type(2)').textContent =
         updatedUser.Biografia || 'Sin descripción.';
 
-      const imgUser = `http://localhost:3000/img/userIcons/${updatedUser.Imagen}`;
+      const imgUser = `http://192.168.50.67:3000/img/userIcons/${updatedUser.Imagen}`;
       console.log('Imagen de usuario:', imgUser);
       document.getElementById('userimage').src = imgUser;
 
@@ -280,8 +280,8 @@ async function generarPublicaciones() {
         // console.log('Receta:', receta);
         // Accedemos directamente a los datos del chef desde la receta
         const chefImage = receta.chef.imagen 
-            ? `http://localhost:3000/img/userIcons/${receta.chef.imagen}`
-            : 'http://localhost:3000/img/userIcons/cheficon.jpg';
+            ? `http://192.168.50.67:3000/img/userIcons/${receta.chef.imagen}`
+            : 'http://192.168.50.67:3000/img/userIcons/cheficon.jpg';
         const chefName = receta.chef.nombreCompleto || `${receta.chef.nombre} ${receta.chef.apellidoPaterno}` || 'Chef Desconocido';
         
         // Obtenemos las interacciones (totales y del usuario actual)
@@ -400,8 +400,8 @@ async function generarPublicaciones() {
 async function obtenerInteracciones(recetaId) {
     try {
         const url = userResult?.ID_Usuario 
-            ? `http://localhost:3000/get-interacciones/${recetaId}?usuarioId=${userResult.ID_Usuario}`
-            : `http://localhost:3000/get-interacciones/${recetaId}`;
+            ? `http://192.168.50.67:3000/get-interacciones/${recetaId}?usuarioId=${userResult.ID_Usuario}`
+            : `http://192.168.50.67:3000/get-interacciones/${recetaId}`;
             
         const response = await fetch(url);
         const data = await response.json();
@@ -467,7 +467,7 @@ function agregarEventosInteraccion(publicacion, recetaId) {
             
             try {
                 // Registrar la interacción en el servidor
-                const response = await fetch('http://localhost:3000/get-interacciones', {
+                const response = await fetch('http://192.168.50.67:3000/get-interacciones', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -629,7 +629,7 @@ document.getElementById('deactivate-account').addEventListener('click', async ()
   try {
       //console.log('Enviando userId al servidor:', userId); // Log para verificar
 
-      const response = await fetch('http://localhost:3000/deactivate-account', {
+      const response = await fetch('http://192.168.50.67:3000/deactivate-account', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId }),
@@ -699,8 +699,8 @@ async function updateFollowersCount(userId) {
   try {
     // Solicitar información de chefs y críticos
     const [chefsResponse, criticsResponse] = await Promise.all([
-      fetch('http://localhost:3000/read-chefs'),
-      fetch('http://localhost:3000/read-food-critics')
+      fetch('http://192.168.50.67:3000/read-chefs'),
+      fetch('http://192.168.50.67:3000/read-food-critics')
     ]);
 
     const chefsData = await chefsResponse.json();
@@ -852,7 +852,7 @@ function initRecipePublication() {
 
       try {
           // Send recipe to server
-          const response = await fetch('http://localhost:3000/create-recipe', {
+          const response = await fetch('http://192.168.50.67:3000/create-recipe', {
               method: 'POST',
               body: formData
           });
@@ -1085,7 +1085,7 @@ function initRecipeForm() {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/create-recipe', {
+      const response = await fetch('http://192.168.50.67:3000/create-recipe', {
         method: 'POST',
         body: formData
       });

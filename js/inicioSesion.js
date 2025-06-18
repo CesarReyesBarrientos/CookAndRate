@@ -15,7 +15,7 @@ async function validateUserData(email, password) {
     const emailError = document.getElementById('emailError');
 
     try {
-        const response = await fetch('http://localhost:3000/login', {
+        const response = await fetch('http://192.168.50.67:3000/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

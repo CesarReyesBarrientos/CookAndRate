@@ -74,7 +74,7 @@ const getUserData = (token) => {
             //console.log('Datos del usuario', userData.userId);
             const data = {};
             data.userId = userData.userId;
-            fetch('http://localhost:3000/find-user-by-id', {
+            fetch('http://192.168.50.67:3000/find-user-by-id', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -197,7 +197,7 @@ function lazyLoadMaps() {
 }
 
 // Obtener el token de Mapbox y configurar los mapas
-fetch('http://localhost:3000/mapbox-token')
+fetch('http://192.168.50.67:3000/mapbox-token')
     .then(response => response.json())
     .then(data => {
         mapboxgl.accessToken = data.token;

@@ -79,7 +79,7 @@ window.onload = () => {
 
 const getRecetas = async () => {
     try {
-        const response = await fetch('http://localhost:3000/read-recetas');
+        const response = await fetch('http://192.168.50.67:3000/read-recetas');
         if (response.ok) {
             const data = await response.json();
             recetasHome = data.recetas;
@@ -111,7 +111,7 @@ const getUserData = (token) => {
         if (userData) {
             const data = {};
             data.userId = userData.userId;
-            fetch('http://localhost:3000/find-user-by-id', {
+            fetch('http://192.168.50.67:3000/find-user-by-id', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -179,8 +179,8 @@ async function generarPublicaciones() {
         // console.log('Receta:', receta);
         // Accedemos directamente a los datos del chef desde la receta
         const chefImage = receta.chef.imagen 
-            ? `http://localhost:3000/img/userIcons/${receta.chef.imagen}`
-            : 'http://localhost:3000/img/userIcons/cheficon.jpg';
+            ? `http://192.168.50.67:3000/img/userIcons/${receta.chef.imagen}`
+            : 'http://192.168.50.67:3000/img/userIcons/cheficon.jpg';
         const chefName = receta.chef.nombreCompleto || `${receta.chef.nombre} ${receta.chef.apellidoPaterno}` || 'Chef Desconocido';
         
         // Obtenemos las interacciones (totales y del usuario actual)
@@ -299,8 +299,8 @@ async function generarPublicaciones() {
 async function obtenerInteracciones(recetaId) {
     try {
         const url = userResult?.ID_Usuario 
-            ? `http://localhost:3000/get-interacciones/${recetaId}?usuarioId=${userResult.ID_Usuario}`
-            : `http://localhost:3000/get-interacciones/${recetaId}`;
+            ? `http://192.168.50.67:3000/get-interacciones/${recetaId}?usuarioId=${userResult.ID_Usuario}`
+            : `http://192.168.50.67:3000/get-interacciones/${recetaId}`;
             
         const response = await fetch(url);
         const data = await response.json();
@@ -366,7 +366,7 @@ function agregarEventosInteraccion(publicacion, recetaId) {
             
             try {
                 // Registrar la interacción en el servidor
-                const response = await fetch('http://localhost:3000/get-interacciones', {
+                const response = await fetch('http://192.168.50.67:3000/get-interacciones', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -513,7 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mostrar estado de carga
     chefsContainer.innerHTML = '<div class="loading">Cargando mejores platillos...</div>';
     
-    fetch('http://localhost:3000/top-3-recetas')
+    fetch('http://192.168.50.67:3000/top-3-recetas')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);

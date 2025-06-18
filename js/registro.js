@@ -234,7 +234,7 @@ function checkPasswords() {
 
 async function checkEmail(email) {
     try {
-        const response = await fetch('http://localhost:3000/checkEmail', {
+        const response = await fetch('http://192.168.50.67:3000/checkEmail', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -303,7 +303,7 @@ registrationForm.addEventListener('submit', function (event) {
             } else if (userType.value === 'critico') {
                 data.studies = studies;
             }
-            url = 'http://localhost:3000/register-user';  
+            url = 'http://192.168.50.67:3000/register-user';  
             console.log(data);
             // Enviar los datos al backend usando fetch
             fetch(url, {
