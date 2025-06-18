@@ -4,6 +4,7 @@ const menuWindow = document.getElementById("menuWindow");
 const closeMenu = document.getElementById("closeMenu");
 const header = document.getElementById("mainHeader");
 let userResult;
+let dataR;
 
 // Abrir menú
 menuButton.addEventListener("click", () => {
@@ -44,11 +45,13 @@ function updateUserInterface() {
     // Función para actualizar la interfaz con los datos cargados
     if (userResult) {
         // Ejemplo: actualizar nombre de usuario
-        document.getElementById('userName').textContent = userResult.Nombre + " " + userResult.ApellidoP + " " + userResult.ApellidoM;
+        document.getElementById('userName').textContent = userResult.Nombre + " " + userResult.Ape_Pat + " " + userResult.Ape_Mat;
                 
         // Ejemplo: actualizar imagen de perfil
-        if (userResult.imagen) {
-            const userImage = `http://192.168.50.209:3000${userResult.imagen}`;
+        console.log('USER: ', dataR);
+        if (dataR.icon) {
+            console.log('Imagen: ', dataR.icon);
+            const userImage = `${dataR.icon}`;
             document.getElementById('userIcon').src = userImage;
             // console.log(foodRResult.Seguidos);
         }
@@ -71,7 +74,7 @@ const getUserData = (token) => {
             //console.log('Datos del usuario', userData.userId);
             const data = {};
             data.userId = userData.userId;
-            fetch('http://192.168.50.209:3000/find-user-by-id', {
+            fetch('http://localhost:3000/find-user-by-id', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -81,6 +84,7 @@ const getUserData = (token) => {
             .then((response) => response.json())
             .then((result) => {
                 userResult = result.user;
+                dataR = result;
                 resolve();
             })
             .catch((error) => {
@@ -193,7 +197,7 @@ function lazyLoadMaps() {
 }
 
 // Obtener el token de Mapbox y configurar los mapas
-fetch('http://192.168.50.209:3000/mapbox-token')
+fetch('http://localhost:3000/mapbox-token')
     .then(response => response.json())
     .then(data => {
         mapboxgl.accessToken = data.token;
