@@ -699,8 +699,8 @@ async function updateFollowersCount(userId) {
   try {
     // Solicitar información de chefs y críticos
     const [chefsResponse, criticsResponse] = await Promise.all([
-      fetch('http://192.168.50.209:3000/read-chefs'),
-      fetch('http://192.168.50.209:3000/read-food-critics')
+      fetch('http://localhost:3000/read-chefs'),
+      fetch('http://localhost:3000/read-food-critics')
     ]);
 
     const chefsData = await chefsResponse.json();
@@ -852,7 +852,7 @@ function initRecipePublication() {
 
       try {
           // Send recipe to server
-          const response = await fetch('http://192.168.50.209:3000/create-recipe', {
+          const response = await fetch('http://localhost:3000/create-recipe', {
               method: 'POST',
               body: formData
           });
@@ -956,15 +956,22 @@ function cambiarIconos(iconOff) {
 
 // Función para inicializar el formulario de recetas
 function initRecipeForm() {
-  // Agregar ingredientes dinámicamente
-  document.getElementById('add-ingredient-btn').addEventListener('click', () => {
-    const container = document.getElementById('ingredients-container');
+  const recipeForm = document.getElementById('recipe-form');
+  const addIngredientBtn = document.getElementById('add-ingredient-btn');
+  const ingredientsContainer = document.getElementById('ingredients-container');
+  const addStepBtn = document.getElementById('add-step-btn');
+  const stepsContainer = document.getElementById('steps-container');
+  const imageInput = document.getElementById('recipe-images');
+  const imagePreviewContainer = document.getElementById('image-preview-container');
+
+  // Agregar ingredientes
+  addIngredientBtn.addEventListener('click', () => {
     const div = document.createElement('div');
     div.className = 'ingredient-input';
     div.innerHTML = `
       <input type="text" class="ingredient-name" placeholder="Nombre" required>
       <input type="text" class="ingredient-amount" placeholder="Cantidad" required>
-      <select class="ingredient-unit" required>
+      <select class="ingredient-unit">
         <option value="gr">gr</option>
         <option value="ml">ml</option>
         <option value="tazas">tazas</option>
@@ -973,46 +980,45 @@ function initRecipeForm() {
       </select>
       <button type="button" class="remove-btn">×</button>
     `;
-    container.appendChild(div);
+    ingredientsContainer.appendChild(div);
     
     div.querySelector('.remove-btn').addEventListener('click', () => {
-      container.removeChild(div);
+      ingredientsContainer.removeChild(div);
     });
   });
 
-  // Agregar pasos dinámicamente
-  document.getElementById('add-step-btn').addEventListener('click', () => {
-    const container = document.getElementById('steps-container');
+  // Agregar pasos
+  addStepBtn.addEventListener('click', () => {
     const div = document.createElement('div');
     div.className = 'step-input';
-    const stepNumber = container.children.length + 1;
+    const stepNumber = stepsContainer.children.length + 1;
     div.innerHTML = `
       <h4>Paso ${stepNumber}</h4>
       <textarea class="step-description" placeholder="Descripción del paso" required></textarea>
       <button type="button" class="remove-btn">×</button>
     `;
-    container.appendChild(div);
+    stepsContainer.appendChild(div);
     
     div.querySelector('.remove-btn').addEventListener('click', () => {
-      container.removeChild(div);
-      // Reindexar los pasos restantes
-      Array.from(container.children).forEach((child, index) => {
+      stepsContainer.removeChild(div);
+      // Reindexar pasos
+      Array.from(stepsContainer.children).forEach((child, index) => {
         child.querySelector('h4').textContent = `Paso ${index + 1}`;
       });
     });
   });
 
   // Vista previa de imágenes
-  document.getElementById('recipe-images').addEventListener('change', function(e) {
-    const previewContainer = document.getElementById('image-preview-container');
-    previewContainer.innerHTML = '';
-    
+  imageInput.addEventListener('change', function(e) {
+    imagePreviewContainer.innerHTML = '';
     Array.from(e.target.files).forEach(file => {
       const reader = new FileReader();
       reader.onload = function(event) {
         const img = document.createElement('img');
         img.src = event.target.result;
-        previewContainer.appendChild(img);
+        img.style.maxWidth = '100px';
+        img.style.margin = '5px';
+        imagePreviewContainer.appendChild(img);
       };
       reader.readAsDataURL(file);
     });
@@ -1022,7 +1028,19 @@ function initRecipeForm() {
   recipeForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    // Recopilar datos del formulario
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      alert('Debes iniciar sesión para crear recetas');
+      return;
+    }
+
+    const userData = parseJWT(token);
+    if (!userData || !userData.userId) {
+      alert('Error al obtener datos de usuario');
+      return;
+    }
+
+    // Obtener datos del formulario
     const recipeData = {
       titulo: document.getElementById('recipe-title').value,
       descripcion: document.getElementById('recipe-description').value,
@@ -1030,7 +1048,7 @@ function initRecipeForm() {
       dificultad: document.getElementById('recipe-difficulty').value,
       ingredientes: [],
       pasos: [],
-      imagenes: []
+      userId: userData.userId
     };
 
     // Obtener ingredientes
@@ -1050,53 +1068,44 @@ function initRecipeForm() {
       });
     });
 
-    // Obtener imágenes (solo nombres para mostrar en consola)
-    recipeData.imagenes = Array.from(document.getElementById('recipe-images').files).map(f => f.name);
+    // Crear FormData
+    const formData = new FormData();
+    formData.append('titulo', recipeData.titulo);
+    formData.append('descripcion', recipeData.descripcion);
+    formData.append('tiempoPreparacion', recipeData.tiempoPreparacion);
+    formData.append('dificultad', recipeData.dificultad);
+    formData.append('ingredientes', JSON.stringify(recipeData.ingredientes));
+    formData.append('pasos', JSON.stringify(recipeData.pasos));
+    formData.append('userId', recipeData.userId);
 
-    // Mostrar datos en consola
-    console.log('Datos de la receta a enviar:', recipeData);
+    // Agregar imágenes
+    const imageFiles = imageInput.files;
+    for (let i = 0; i < imageFiles.length; i++) {
+      formData.append('imagenes', imageFiles[i]);
+    }
 
     try {
-  const formData = new FormData();
+      const response = await fetch('http://localhost:3000/create-recipe', {
+        method: 'POST',
+        body: formData
+      });
 
-  // Agregar campos simples
-  formData.append('titulo', recipeData.titulo);
-  formData.append('descripcion', recipeData.descripcion);
-  formData.append('tiempoPreparacion', recipeData.tiempoPreparacion);
-  formData.append('dificultad', recipeData.dificultad);
-
-  // Agregar ingredientes y pasos como JSON string
-  formData.append('ingredientes', JSON.stringify(recipeData.ingredientes));
-  formData.append('pasos', JSON.stringify(recipeData.pasos));
-
-  // Agregar imágenes
-  const imageFiles = document.getElementById('recipe-images').files;
-  for (let i = 0; i < imageFiles.length; i++) {
-    formData.append('imagenes', imageFiles[i]); // el nombre del campo debe coincidir con el backend
-  }
-
-  const response = await fetch('/api/create-recipe', {
-    method: 'POST',
-    body: formData
-  });
-
-  const result = await response.json();
-  console.log('Respuesta del servidor:', result);
-
-  if (response.ok) {
-    alert('Receta creada con éxito!');
-    recipeModal.style.display = 'none';
-    recipeForm.reset();
-    document.getElementById('image-preview-container').innerHTML = '';
-  } else {
-    alert('Error al crear receta');
-  }
-} catch (error) {
-  console.error('Error al enviar receta:', error);
-  alert('Ocurrió un error al enviar la receta.');
-}
-
-    recipeModal.style.display = 'none';
+      const result = await response.json();
+      
+      if (response.ok) {
+        alert('Receta creada con éxito!');
+        recipeModal.style.display = 'none';
+        recipeForm.reset();
+        imagePreviewContainer.innerHTML = '';
+        // Actualizar lista de recetas
+        getRecetas(userData.userId);
+      } else {
+        throw new Error(result.error || 'Error al crear receta');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al crear receta: ' + error.message);
+    }
   });
 }
 
