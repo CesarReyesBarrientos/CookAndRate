@@ -69,27 +69,57 @@
 <!-- Botón de desactivar cuenta -->
 <button id="deactivate-account" class="deactivate-btn" style=" font-family: Noto Serif Ahom serif;"  ><i class="fa-solid fa-user" style="color: #ffffff;"></i>&nbsp;Deactivate Account</button>
 
-<!-- Recipe Creation Modal -->
-<div id="recipe-modal" class="modal2">
-    <div class="modal-content2">
-        <span class="close-recipe-modal">&times;</span>
-        <h2>Crear Nueva Receta</h2>
-        <form id="recipe-form">
-            <input type="text" id="recipe-title" placeholder="Título de la receta" required>
-            
-            <div id="ingredients-container">
-                <!-- Dynamic ingredient inputs will be added here -->
-            </div>
-            <button type="button" id="add-ingredient-btn">Agregar Ingrediente</button>
-            
-            <textarea id="recipe-steps" placeholder="Pasos de elaboración (uno por línea)" required></textarea>
-            
-            <input type="file" id="recipe-images" multiple accept="image/*">
-            <div id="image-preview-container"></div>
-            
-            <button type="submit">Publicar Receta</button>
-        </form>
-    </div>
+<!-- Modal para crear receta -->
+<div id="recipe-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Crear Nueva Receta</h2>
+    <form id="recipe-form">
+      <div class="form-group">
+        <label for="recipe-title">Título:</label>
+        <input type="text" id="recipe-title" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="recipe-description">Descripción:</label>
+        <textarea id="recipe-description" required></textarea>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="recipe-time">Tiempo (min):</label>
+          <input type="number" id="recipe-time" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="recipe-difficulty">Dificultad:</label>
+          <select id="recipe-difficulty" required>
+            <option value="1">Fácil</option>
+            <option value="3">Media</option>
+            <option value="5">Difícil</option>
+          </select>
+        </div>
+      </div>
+      
+      <h3>Ingredientes</h3>
+      <div id="ingredients-container">
+        <!-- Ingredientes se agregarán aquí dinámicamente -->
+      </div>
+      <button type="button" id="add-ingredient-btn" class="btn-add">+ Agregar Ingrediente</button>
+      
+      <h3>Pasos de Preparación</h3>
+      <div id="steps-container">
+        <!-- Pasos se agregarán aquí dinámicamente -->
+      </div>
+      <button type="button" id="add-step-btn" class="btn-add">+ Agregar Paso</button>
+      
+      <h3>Imágenes</h3>
+      <input type="file" id="recipe-images" multiple accept="image/*">
+      <div id="image-preview-container"></div>
+      
+      <button type="submit" class="btn-submit">Crear Receta</button>
+    </form>
+  </div>
 </div>
 
 

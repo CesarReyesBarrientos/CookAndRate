@@ -234,7 +234,7 @@ function checkPasswords() {
 
 async function checkEmail(email) {
     try {
-        const response = await fetch('http://192.168.50.209:3000/checkEmail', {
+        const response = await fetch('http://localhost:3000/checkEmail', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -261,6 +261,7 @@ registrationForm.addEventListener('submit', function (event) {
     formData.forEach((value, key) => {
         data[key] = value;
     });
+    console.log('DATOS: ',data);
 
     // Dividir el campo "nombre" en nombre, apellidoP y apellidoM
     const fullName = data.name.split(' '); // Suponiendo que los nombres están separados por espacios
@@ -302,8 +303,8 @@ registrationForm.addEventListener('submit', function (event) {
             } else if (userType.value === 'critico') {
                 data.studies = studies;
             }
-            url = 'http://192.168.50.209:3000/register-user';  
-
+            url = 'http://localhost:3000/register-user';  
+            console.log(data);
             // Enviar los datos al backend usando fetch
             fetch(url, {
                 method: 'POST',

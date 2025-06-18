@@ -2,6 +2,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: #f0f2f5;
+  font-family: "Noto Serif Ahom", serif;
 }
 .profile-page {
   width: 100%;
@@ -88,59 +89,6 @@ body {
   width: 100%;
   border-radius: 5px;
 }
-
-.publicidad, .publicacion {
-        width: 100%;
-        max-width: 800px;
-        margin: 40px auto;
-        background-color: #f8f8f8;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        padding: 20px;
-    }
-
-    .publicidad img, .publicacion img {
-        width: 200px;
-        height: 200px;
-        object-fit: cover;
-        border-radius: 10px;
-    }
-
-    .text-container {
-        margin-left: 20px; 
-        display: flex;
-        flex-direction: column;
-    }
-
-    .main-text {
-        font-size: 18px;
-        font-weight: bold;
-        color: #333;
-    }
-
-    .subtext {
-        font-size: 14px;
-        color: #777;
-    }
-
-    /* Carrusel dentro de la publicidad/publicación */
-    .carousel {
-        position: relative;
-        width: 100%;
-        overflow: hidden; /* Asegura que solo se vea una imagen a la vez */
-    }
-
-    .carousel-images {
-        display: flex;
-        transition: transform 0.5s ease-in-out;
-        width: 300%; /* Ancho total del contenedor para 3 imágenes */
-    }
-
-    .carousel img {
-        width: 33.33%; /* Cada imagen ocupa un 33.33% del contenedor */
-        height: 500px;
-        object-fit: cover;
-    }
 
     /* Botones de navegación */
     .btn {
@@ -404,17 +352,6 @@ body {
   #deactivate-account:hover {
     background-color: darkred;
   }
-  
-.main-text {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-}
-
-.subtext {
-  font-size: 14px;
-  color: #777;
-}
 
 .btn {
   position: absolute;
@@ -858,3 +795,348 @@ a.Id_receta:hover{
   margin: 0; /* Eliminar márgenes para una alineación más precisa */
 }
 
+.publicacion {
+    display: flex;
+    flex-direction: column;
+    /* max-height: 1200px; */
+    width: 100%;
+    max-width: 800px;
+    margin: 40px auto;
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.publicidad img {
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.publicacion img {
+    width: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.text-container {
+    margin-left: 20px; /* Espacio entre imagen y texto */
+    display: flex;
+    flex-direction: column;
+}
+
+.main-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.subtext {
+    font-size: 14px;
+    color: #777;
+}
+
+.contenido {
+    padding: 0 10px;
+}
+
+/* Carrusel dentro de la publicidad/publicación */
+.carousel {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    /* border: 1px solid red; */
+}
+
+.carousel-images {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 300%;
+    height: 100%;
+}
+
+.carousel-images img {
+    width: 33.3337%;
+    object-fit: cover;
+    aspect-ratio: 16/9; 
+    /* border: 1px solid blue; */
+}
+
+/* Botones de navegación */
+.btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    font-size: 18px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.btn.left {
+    left: 10px;
+}
+
+.btn.right {
+    right: 10px;
+}
+
+/* Estilos para el área de comentarios */
+.comentarios {
+    margin-top: 20px;
+}
+
+.comentarios textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.comentarios button {
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.comentarios button:hover {
+    background-color: #555;
+}
+
+.comentarios-list {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #333;
+}
+
+.comentario-item {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.interacciones-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 15px;
+}
+
+.interaccion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    min-width: 60px;
+}
+
+.interaccion:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.interaccion i {
+    font-size: 22px;
+    margin-bottom: 5px;
+    transition: all 0.2s ease;
+}
+
+.interaccion .contador {
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+}
+
+
+div.containerRow{
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+}
+img.imgPubli {
+    height: 70px; 
+    width: 70px; 
+    border-radius: 50px;
+}
+.parent-div {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+.child-div {
+    width: 20%;
+    text-align: center;
+    padding: 10px;
+    padding-bottom: 0;
+    box-sizing: border-box;
+    align-items: baseline;
+}
+.last-child {
+    width: 46%;
+    display: flex;
+    text-align: center;
+    justify-content: right;
+    align-items: baseline;
+}
+.child-div p {
+    margin: 0; 
+}
+
+/* Estilos del modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.close-modal {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-modal:hover {
+  color: black;
+}
+
+/* Estilos del formulario */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+textarea {
+  min-height: 80px;
+}
+
+.btn-add {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+.btn-add:hover {
+  background-color: #e0e0e0;
+}
+
+.btn-submit {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+}
+
+.btn-submit:hover {
+  background-color: #45a049;
+}
+
+#image-preview-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+#image-preview-container img {
+  max-width: 100px;
+  max-height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* Estilos para ingredientes y pasos */
+.ingredient-input,
+.step-input {
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: #ff4444;
+  color: white;
+  border: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -104,28 +104,6 @@ const parseJWT = (token) => {
     }
 };
 
-const getChefData = async (userId) => {
-    try {
-        // Hacemos una solicitud POST al back-end
-        const response = await fetch('http://192.168.50.209:3000/find-chef-by-user-id', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId: userId })  // Enviamos el userId en el cuerpo
-        });
-
-        if (response.avaible === "1") {
-            const data = await response.json();  // Convertimos la respuesta a JSON
-            //console.log("INFORMACION CHEFS SEGUIDOS:"+data);
-        } else {
-            console.error('Error en la respuesta:', response.statusText);
-        }
-    } catch (error) {
-        console.error('Error en la solicitud:', error.message);
-    }
-};
-
 // Funcionalidad nueva aplicada para obtener los datos del usuario
 const getUserData = (token) => {
     return new Promise((resolve, reject) => {
@@ -142,7 +120,7 @@ const getUserData = (token) => {
             })
             .then((response) => response.json())
             .then((result) => {
-                // console.log('User Data', result);
+                console.log('User Data', result);
                 // console.log('Datos usuario:', result.user);
                 // console.log('Imagen de usuario:', result.icon);
                 userResult = result.user;
@@ -203,7 +181,6 @@ async function generarPublicaciones() {
         const chefImage = receta.chef.imagen 
             ? `http://localhost:3000/img/userIcons/${receta.chef.imagen}`
             : 'http://localhost:3000/img/userIcons/cheficon.jpg';
-
         const chefName = receta.chef.nombreCompleto || `${receta.chef.nombre} ${receta.chef.apellidoPaterno}` || 'Chef Desconocido';
         
         // Obtenemos las interacciones (totales y del usuario actual)
@@ -353,8 +330,6 @@ async function obtenerInteracciones(recetaId) {
     }
 }
 
-
-
 function agregarEventosInteraccion(publicacion, recetaId) {
     const interacciones = publicacion.querySelectorAll('.interaccion');
     
@@ -450,7 +425,6 @@ function agregarEventosInteraccion(publicacion, recetaId) {
     });
 }
 
-
 const tabs = document.querySelectorAll('.tab');
 const tabContents = document.querySelectorAll('.tab-content');
   
@@ -528,47 +502,6 @@ function cambiarIconos(iconOff) {
         }
 }
 
-function registrarInteraccion(event) {
-    if (event.target.classList.contains('interact')) {
-        const interactID = event.target.id;
-        const receta = event.target.getAttribute('data-receta');
-        const fechaInteraccion = new Date().toISOString();
-        const tiposInteraccion = {
-            'int-01': 'Me encanta',
-            'int-03': 'Me gusta',
-            'int-05': 'No me gusta'
-        };
-        const descripcionInteraccion = tiposInteraccion[interactID] || interactID;
-
-        const datos = {
-            tipoInteraccion: descripcionInteraccion,
-            idReceta: receta,
-            idUsuario: userResult.ID_User,
-            fechaInteraccion: fechaInteraccion
-        };
-
-        // Hacer la solicitud POST
-        fetch('http://192.168.50.209:3000/add-interaction', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(datos)
-        })
-        .then(response => response.json())
-        .then(data => {
-            setUserInteracts(); // Actualiza la UI después de la respuesta
-        })
-        .catch(error => {
-            console.error('Error al agregar la interacción:', error);
-        });
-
-        // Después de registrar la interacción, cambia los iconos
-        if (event.target.classList.contains('icon-off')) {
-            cambiarIconos(event.target);
-        }
-    }
-}
 
 const enviarIcon = document.querySelector('.enviar_');
 const ratingSelect = document.querySelector('.rating');

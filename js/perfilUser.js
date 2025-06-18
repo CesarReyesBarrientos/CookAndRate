@@ -1,4 +1,8 @@
 const menuButton = document.getElementById("menuButton");
+const recipeModal = document.getElementById('recipe-modal');
+const openCreateRecipeModalButton = document.getElementById('create-recipe-btn');
+const closeModalBtn = document.querySelector('.close-modal');
+const recipeForm = document.getElementById('recipe-form');
 const menuWindow = document.getElementById("menuWindow");
 const closeMenu = document.getElementById("closeMenu");
 let userResult;
@@ -6,28 +10,43 @@ let chefResult;
 let recetasChefResult; 
 let foodRResult;
 let recetasPagina;
+let userById;
+let recetasHome = [];
 
 window.onload = () => {
-  const token = localStorage.getItem('authToken');
-  if (!token) {
-      alert('No estás autenticado. Por favor, inicia sesión.');
-      window.location.href = 'index.html';
-      return;
-  }
-
-  getUserData(token)
-    .then(user => {
-      if (user.Estado === 0) {
-          alert('Tu cuenta está desactivada. Contacta al soporte si deseas reactivarla.');
-          window.location.href = 'index.html';
-          //return;
-      }
-      updateUserInterface();
-  }).catch(error => {
-      console.error('Error al verificar el estado del usuario:', error);
-      alert('Hubo un problema al verificar tu cuenta.');
-  });
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        alert('No estás autenticado. Por favor, inicia sesión.');
+        window.location.href = 'index.html';
+    } else {
+        getUserData(token)
+            .then(() => {
+                getRecetas(userById.user.ID_Usuario);
+                console.log('Datos del usuario obtenidos:', userById.user.ID_Usuario);
+                updateUserInterface();
+            })
+            .catch(error => {
+                console.error('Error al obtener datos de usuario:', error);
+            });
+    }
 };
+
+// Abrir modal
+openCreateRecipeModalButton.addEventListener('click', () => {
+  recipeModal.style.display = 'block';
+});
+
+// Cerrar modal
+closeModalBtn.addEventListener('click', () => {
+  recipeModal.style.display = 'none';
+});
+
+// Cerrar modal al hacer clic fuera
+window.addEventListener('click', (event) => {
+  if (event.target === recipeModal) {
+    recipeModal.style.display = 'none';
+  }
+});
 
 // Decodifica el token JWT
 const parseJWT = (token) => {
@@ -42,47 +61,84 @@ const parseJWT = (token) => {
 };
 
 // Obtiene datos del usuario logueado y actualiza el perfil
-function getUserData(token) {
+async function getUserData(token) {
   const userData = parseJWT(token);
   if (userData) {
     const data = { userId: userData.userId };
-    return fetch('http://192.168.50.209:3000/find-user-by-id', {
+    const response = await fetch('http://localhost:3000/find-user-by-id', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        if (result.user) {
-          userResult = result.user;
-          // Actualizar los datos del perfil en la vista
-          document.querySelector('.profile-details h2').textContent =
-            `${result.user.Nombre} ${result.user.ApellidoP} ${result.user.ApellidoM}`;
-          document.querySelector('.biografia').textContent =
-            result.user.Biografia || 'Sin descripción.';
-          document.querySelector('.profile-photo img').src = `http://192.168.50.209:3000${result.user.imagen}`;
+    });
+    const result = await response.json();
+    
+    if (result.user) {
+      userResult = result.user;
+      userById = result;
+      console.log('Datos del usuario:', result);
+      
+      // Actualizar UI básica
+      document.querySelector('.profile-details h2').textContent =
+        `${result.user.Nombre} ${result.user.Ape_Pat} ${result.user.Ape_Mat}`;
+      document.querySelector('.biografia').textContent = result.user.Biografia || 'Sin descripción.';
+      document.querySelector('.profile-photo img').src = `${result.icon}`;
 
-          // Llamar a la función para actualizar el número de seguidores/seguidos
-          updateFollowersCount(result.user.ID_User);
+      // Obtener y mostrar estadísticas de seguimiento
+      const stats = await obtenerEstadisticasSeguimiento(result.user.ID_Usuario);
+      document.getElementById('followers').textContent = `${stats.seguidores || 0} seguidores`;
+      document.getElementById('follows').textContent = `${stats.seguidos || 0} seguidos`;
 
-          // Precargar los datos en el formulario
-          document.getElementById('nombre').value = result.user.Nombre;
-          document.getElementById('apellidoP').value = result.user.ApellidoP;
-          document.getElementById('apellidoM').value = result.user.ApellidoM;
-          document.getElementById('email').value = result.user.Email;
-          document.getElementById('email').setAttribute('data-original-email', result.user.Email);
-          document.getElementById('telefono').value = result.user.Telefono;
-          document.getElementById('biografia').value = result.user.Biografia;
-
-          return result.user; // Devolver el usuario para poder usar .then() en la llamada
-        } else {
-          console.error('No se encontró el usuario en los datos recibidos.');
-          throw new Error('Usuario no encontrado');
-        }
-      });
+      // Precargar datos en el formulario
+      document.getElementById('nombre').value = result.user.Nombre;
+      document.getElementById('apellidoP').value = result.user.Ape_Pat;
+      document.getElementById('apellidoM').value = result.user.Ape_Mat;
+      document.getElementById('email').value = result.user.Email;
+      document.getElementById('email').setAttribute('data-original-email', result.user.Email);
+      document.getElementById('biografia').value = result.user.Biografia;
+      
+      return result.user;
+    } else {
+      throw new Error('Usuario no encontrado');
+    }
   } else {
-    return Promise.reject(new Error('Token inválido.'));
+    throw new Error('Token inválido');
   }
+}
+
+const getRecetas = async (idDeseado) => {  // Añade parámetro para el ID deseado
+    try {
+        const response = await fetch('http://localhost:3000/read-recetas');
+        if (response.ok) {
+            const data = await response.json();
+            // Filtra las recetas para obtener solo las que coincidan con el ID deseado
+            // console.log('Recetas obtenidas:', data.recetas);
+            recetasHome = data.recetas.filter(receta => receta.chef.usuarioId === idDeseado);
+            console.log('Recetas filtradas:', recetasHome);
+            generarPublicaciones();
+        } else {
+            console.error('Error en la respuesta:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error en la solicitud:', error.message);
+    }
+};
+
+
+async function obtenerEstadisticasSeguimiento(userId) {
+    try {
+        const response = await fetch(`http://localhost:3000/estadisticas-seguimiento/${userId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log('Estadísticas:', data.estadisticas);
+            return data.estadisticas;
+        } else {
+            throw new Error(data.message || 'Error al obtener estadísticas');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        return { seguidores: 0, seguidos: 0 }; // Valores por defecto en caso de error
+    }
 }
 
 // Mostrar/ocultar formulario de edición
@@ -106,237 +162,369 @@ document.getElementById('imagen').addEventListener('change', (event) => {
   }
 });
 
-// Manejo del formulario de edición
+
+// Nuevo código para manejar pestañas
+
 document.getElementById('edit-form').addEventListener('submit', async (event) => {
   event.preventDefault();
 
+  const userId = userById.user.ID_Usuario;
+  console.log('User ID:', userId);
   const email = document.getElementById('email').value;
   const originalEmail = document.getElementById('email').getAttribute('data-original-email');
 
-  const formData = new FormData();
-  formData.append('nombre', document.getElementById('nombre').value);
-  formData.append('apellidoP', document.getElementById('apellidoP').value);
-  formData.append('apellidoM', document.getElementById('apellidoM').value);
-  formData.append('email', email);
-  formData.append('telefono', document.getElementById('telefono').value);
-  formData.append('biografia', document.getElementById('biografia').value);
-  console.log(email);
-
   const imagenInput = document.getElementById('imagen');
-  if (imagenInput.files[0]) {
-      formData.append('imagen', imagenInput.files[0]);
-  }
 
   try {
-      // Validar correo solo si ha cambiado
-      if (email !== originalEmail) {
-          const checkResponse = await fetch('http://192.168.50.209:3000/checkEmail', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email }),
-          });
-
-          const checkResult = await checkResponse.json();
-          if (checkResult.available === "1") {
-              alert('El correo electrónico ya está en uso. Por favor, utiliza otro.');
-              return; // Detener la ejecución si el correo está en uso
-          }
-      }
-
-      // Actualizar perfil
-      const updateResponse = await fetch('http://192.168.50.209:3000/update-user', {
-          method: 'POST',
-          body: formData,
+    // 1. Validar email si ha cambiado
+    if (email !== originalEmail) {
+      const checkResponse = await fetch('http://localhost:3000/checkEmail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
       });
 
-      const updateResult = await updateResponse.json();
-      if (updateResult.success) {
-          alert('Perfil actualizado correctamente');
-
-          // Actualizar el DOM con los nuevos datos
-          const updatedUser = updateResult.user;
-          // console.log(updatedUser);
-          document.querySelector('.profile-details h2').textContent =
-              `${updatedUser.Nombre} ${updatedUser.ApellidoP} ${updatedUser.ApellidoM}`;
-          document.querySelector('.profile-details p:nth-of-type(2)').textContent =
-              updatedUser.Biografia || 'Sin descripción.';
-            // if (updatedUser.imagen) {
-              const imgUser = `http://192.168.50.209:3000/img/userIcons/${updatedUser.imagen}?t=${Date.now()}`;
-            
-
-          // Actualizar el formulario con los nuevos valores
-          document.getElementById('nombre').value = updatedUser.Nombre;
-          document.getElementById('apellidoP').value = updatedUser.ApellidoP;
-          document.getElementById('apellidoM').value = updatedUser.ApellidoM;
-          document.getElementById('email').value = updatedUser.Email;
-          document.getElementById('telefono').value = updatedUser.Telefono;
-          document.getElementById('biografia').value = updatedUser.Biografia;
-          document.getElementById('userimage').src = imgUser;
-          fetchRecetas();
-      } else {
-          alert('Error al actualizar el perfil');
+      const checkResult = await checkResponse.json();
+      if (checkResult.available === "1") {
+        alert('El correo electrónico ya está en uso. Por favor, utiliza otro.');
+        return;
       }
-  } catch (error) {
-      console.error('Error:', error);
-      alert('Ocurrió un error al verificar o actualizar los datos.');
-  }
-});
-
-document.addEventListener('DOMContentLoaded', fetchRecetas);
-// Nuevo código para manejar pestañas
-document.addEventListener('DOMContentLoaded', () => {
-  const tabs = document.querySelectorAll('.tab');
-  const tabContents = document.querySelectorAll('.tab-content');
-
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      const target = tab.getAttribute('data-target');
-
-      // Desactivar todas las pestañas y contenidos
-      tabs.forEach(t => t.classList.remove('active'));
-      tabContents.forEach(tc => tc.classList.remove('active'));
-
-      // Activar la pestaña y contenido seleccionados
-      tab.classList.add('active');
-      document.querySelector(`.tab-content.${target}`).classList.add('active');
-    });
-  });
-});
-
-// Modificar fetchRecetas para manejar chefs sin recetas
-async function fetchRecetas() {
-  try {
-    const token = localStorage.getItem('authToken');
-    const userData = JSON.parse(atob(token.split('.')[1]));
-    const currentUserId = userData.userId;
-
-    const recetasResponse = await fetch('http://192.168.50.209:3000/read-recetas');
-    const recetasData = await recetasResponse.json();
-    const recetas = recetasData.recetas;
-
-    const chefsResponse = await fetch('http://192.168.50.209:3000/read-chefs');
-    const chefsData = await chefsResponse.json();
-    const chefs = chefsData.chefs;
-
-    const usersResponse = await fetch('http://192.168.50.209:3000/read-users');
-    const usersData = await usersResponse.json();
-    const users = usersData.users;
-
-    const criticResponse = await fetch('http://192.168.50.209:3000/read-food-critics');
-    const criticData = await criticResponse.json();
-    const critics = criticData.food_rev;
-
-    // Check if the current user is a chef or a critic
-    const currentChef = chefs.find(chef => chef.ID_User === currentUserId);
-    const currentCritic = critics?.find(critic => critic.ID_User === currentUserId);
-
-    let filteredRecetas = [];
-    let filteredImages = [];
-
-    if (currentChef) {
-      // Filter recipes specifically for this chef
-      filteredRecetas = recetas.filter(receta => receta.ID_Chef === currentChef.ID_Chef);
-      
-      // Si no hay recetas, mostrar un mensaje
-      if (filteredRecetas.length === 0) {
-        const publicacionesContainer = document.querySelector('.tab-content.publicaciones');
-        publicacionesContainer.innerHTML = '<p>Aún no tienes publicaciones.</p>';
-      } else {
-        generarPublicaciones(filteredRecetas, chefs, users);
-        setUserInteracts();
-      }
-      
-      // Collect all images from the chef's recipes for the gallery
-      filteredImages = filteredRecetas.flatMap(receta => 
-        receta.Imagenes.map(img => img.startsWith('http') ? img : `http://192.168.50.209:3000/img/recetas/${img}`)
-      );      
-    } else if (currentCritic) {
-      // If user is a critic, leave recipes empty
-      filteredRecetas = [];
     }
 
-    generarGaleria(filteredImages);
+    // 2. Subir imagen si existe
+    if (imagenInput.files[0]) {
+      const imagenOriginal = imagenInput.files[0];
+      const extension = imagenOriginal.name.split('.').pop(); // por ejemplo: 'png' o 'jpg'
+      const nuevoNombre = `${userId}.${extension}`;
+
+      // Crear un nuevo File con el nuevo nombre
+      const imagenRenombrada = new File([imagenOriginal], nuevoNombre, {
+        type: imagenOriginal.type,
+      });
+
+      const imageForm = new FormData();
+      imageForm.append('userId', userId);
+      imageForm.append('userIcon', imagenRenombrada);
+
+      console.log('Subiendo imagen como:', imagenRenombrada);
+
+
+      const uploadResponse = await fetch('http://localhost:3000/api/upload-user-icon', {
+        method: 'POST',
+        body: imageForm
+      });
+
+      const uploadResult = await uploadResponse.json();
+      if (!uploadResult.success) {
+        alert('Error al subir la imagen');
+        return;
+      }
+    }
+
+    // 3. Actualizar perfil (nombre, apellidos, biografía)
+    const updateData = {
+      userId: userResult.ID_Usuario,
+      nombre: document.getElementById('nombre').value,
+      apellidoP: document.getElementById('apellidoP').value,
+      apellidoM: document.getElementById('apellidoM').value,
+      biografia: document.getElementById('biografia').value,
+      email: email// Usar la URL de la imagen subida o la existente
+    };
+    const updateResponse = await fetch('http://localhost:3000/update-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updateData)
+    });
+
+    const updateResult = await updateResponse.json();
+    if (updateResult.success) {
+      alert('Perfil actualizado correctamente');
+      const updatedUser = updateResult.user;
+
+      // Actualizar DOM
+      document.querySelector('.profile-details h2').textContent =
+        `${updatedUser.Nombre} ${updatedUser.Ape_Pat} ${updatedUser.Ape_Mat}`;
+      document.querySelector('.profile-details p:nth-of-type(2)').textContent =
+        updatedUser.Biografia || 'Sin descripción.';
+
+      const imgUser = `http://localhost:3000/img/userIcons/${updatedUser.Imagen}`;
+      console.log('Imagen de usuario:', imgUser);
+      document.getElementById('userimage').src = imgUser;
+
+      // Actualizar campos del formulario
+      document.getElementById('nombre').value = updatedUser.Nombre;
+      document.getElementById('apellidoP').value = updatedUser.Ape_Pat;
+      document.getElementById('apellidoM').value = updatedUser.Ape_Mat;
+      document.getElementById('email').value = updatedUser.Email;
+      document.getElementById('biografia').value = updatedUser.Biografia;
+
+      fetchRecetas();
+    } else {
+      alert('Error al actualizar el perfil');
+    }
+
   } catch (error) {
-    console.error('Error al obtener los datos:', error);
+    console.error('Error:', error);
+    alert('Ocurrió un error al actualizar los datos.');
   }
+});
+
+
+// Modificar fetchRecetas para manejar chefs sin recetas
+async function generarPublicaciones() {
+    const publicacionesContainer = document.querySelector('.publicaciones');
+    publicacionesContainer.innerHTML = ''; 
+
+    // Usamos for...of en lugar de forEach para poder usar await
+    for (const receta of recetasHome) {
+        // console.log('Receta:', receta);
+        // Accedemos directamente a los datos del chef desde la receta
+        const chefImage = receta.chef.imagen 
+            ? `http://localhost:3000/img/userIcons/${receta.chef.imagen}`
+            : 'http://localhost:3000/img/userIcons/cheficon.jpg';
+        const chefName = receta.chef.nombreCompleto || `${receta.chef.nombre} ${receta.chef.apellidoPaterno}` || 'Chef Desconocido';
+        
+        // Obtenemos las interacciones (totales y del usuario actual)
+        const interaccionReceta = await obtenerInteracciones(receta.id) || {
+            meEncanta: 0,
+            meGusta: 0,
+            noMeGusta: 0,
+            usuarios: [] // Esto es un array
+        };
+
+        
+        
+        // Para encontrar al usuario actual (si está logueado)
+        if (userResult?.ID_Usuario) {
+            const miInteraccion = interaccionReceta.usuarios.find(
+                u => u.userId === userResult.ID_Usuario
+            );
+
+            
+        }
+        const getIconState = (tipo) => {
+            // Verificar si hay usuario logueado
+            if (!userResult?.ID_Usuario) {
+                return {
+                    class: 'fa-regular',
+                    color: '#000000'
+                };
+            }
+
+            // Buscar si el usuario actual tiene una interacción de este tipo en esta receta
+            const usuarioInteraccion = interaccionReceta.usuarios.find(
+                u => u.userId === userResult.ID_Usuario && u.Tipo === tipo
+            );
+
+            if (usuarioInteraccion) {
+                return {
+                    class: 'fa-solid',
+                    color: tipo === 'Me encanta' ? '#ff0000' : '#11306f'
+                };
+            }
+            
+            return {
+                class: 'fa-regular',
+                color: '#000000'
+            };
+        };
+
+        
+
+        const publicacion = document.createElement('div');
+        publicacion.classList.add('publicacion');
+
+        publicacion.innerHTML = `
+            <div class="containerColumn">
+                <div class="containerRow">
+                    <div class="containerColumn">
+                        <div><a href="#" target="_blank"><img class="imgPubli" src="${chefImage}" alt="Foto de perfil"></a></div>
+                    </div>
+                    <div class="containerColumn">
+                        <div class="main-text">${receta.titulo}</div>
+                        <div class="subtext">${chefName}</div>
+                    </div>
+                </div>
+                <div>
+                    <strong class="contenido">Ingredientes:</strong><br>
+                    ${Object.entries(receta.ingredientes).map(([ingrediente, cantidad]) => 
+                        `&nbsp;&nbsp;${ingrediente}: ${cantidad}<br>`).join('')}
+                    <br>
+                    <strong class="contenido">¡A cocinar!</strong><br>
+                    ${receta.pasos.map((paso, index) => 
+                        `&nbsp;&nbsp;${index + 1}. ${paso}<br>`).join('')}
+                </div>
+            </div>
+            <div class="carousel">
+                <button class="btn left">&lt;</button>
+                <div class="carousel-images">
+                    ${receta.imagenes.map(imgUrl => 
+                        `<img src="${imgUrl}" alt="Imagen de receta">`).join('')}
+                </div>
+                <button class="btn right">&gt;</button>
+            </div>
+            <!-- Sección de interacciones -->
+                <div class="interacciones-container">
+                <div class="interaccion" data-tipo="meEncanta" data-receta-id="${receta.id}">
+                    <i class="${getIconState('Me encanta').class} fa-heart" style="color: ${getIconState('Me encanta').color}"></i>
+                    <span class="contador">${interaccionReceta.meEncanta ?? 0}</span>
+                </div>
+                <div class="interaccion" data-tipo="meGusta" data-receta-id="${receta.id}">
+                    <i class="${getIconState('Me gusta').class} fa-thumbs-up" style="color: ${getIconState('Me gusta').color}"></i>
+                    <span class="contador">${interaccionReceta.meGusta ?? 0}</span>
+                </div>
+                <div class="interaccion" data-tipo="noMeGusta" data-receta-id="${receta.id}">
+                    <i class="${getIconState('No me gusta').class} fa-thumbs-down" style="color: ${getIconState('No me gusta').color}"></i>
+                    <span class="contador">${interaccionReceta.noMeGusta ?? 0}</span>
+                </div>
+            </div>
+        `;
+        
+        publicacionesContainer.appendChild(publicacion);
+        setupCarousel(publicacion.querySelector('.carousel'));
+
+        // Solo agregar eventos si hay usuario logueado
+        if (userResult?.ID_Usuario) {
+            agregarEventosInteraccion(publicacion, receta.id);
+        } else {
+            // Mostrar tooltip o mensaje si no está logueado
+            publicacion.querySelectorAll('.interaccion').forEach(interaccion => {
+                interaccion.style.cursor = 'not-allowed';
+                interaccion.title = 'Inicia sesión para interactuar';
+            });
+        }
+    }
 }
 
-function generarPublicaciones(recetas, chefs, users) {
-  const publicacionesContainer = document.querySelector('.tab-content.publicaciones');
-  publicacionesContainer.innerHTML = '';
-  recetas.forEach((receta) => {
-    console.log('Id_Chef de la receta:', receta.ID_Chef);
-    const chef = chefs.find((c) => c.ID_Chef === receta.ID_Chef);
-    const user = chef ? users.find((u) => u.ID_User === chef.ID_User) : null;
-    //console.log(user);
-    const chefImage = user
-      ? `http://192.168.50.209:3000/img/userIcons/${user.imagen}?t=${Date.now()}`
-      : 'http://192.168.50.209:3000/img/default.png?t=${Date.now()}';
-    const chefName = user ? `${user.Nombre} ${user.ApellidoP}` : 'Chef Desconocido';
-
-    const publicacion = document.createElement('div');
-    publicacion.classList.add('publicacion');
-
-    publicacion.innerHTML = `
-      <div style="display: flex; align-items: center; margin-bottom: 5px;">
-        <img style="height: 70px; width: 70px; margin-right: 10px;" src="${chefImage}" alt="Foto de perfil">
-        <div class="text-container">
-          <h2 style="font-size: 18px; margin: 0;">${receta.Titulo_Receta}</h2>
-          <p style="font-size: 14px; color: gray; margin: 2px 0;">By ${chefName}</p>
-        </div>
-      </div>
-      <div class="main-text" style="margin: 10px 0; font-size: 16px; color: #333; text-align: justify;">
-        <strong>Ingredients:</strong><br>
-        ${Object.entries(receta.Ingredientes)
-          .map(([key, value]) => `&nbsp;&nbsp;${key}: ${value}<br>`)
-          .join('')}
-        <br>
-        <strong>Let's cook!</strong><br>
-        ${receta.Pasos_Elaboracion.map((paso, i) => `${i + 1}. ${paso}<br>`).join('')}
-      </div>
-    `;
-
-    // Carrusel de imágenes
-    const carousel = document.createElement('div');
-    carousel.classList.add('carousel');
-    carousel.innerHTML = `
-      <button class="btn left">&lt;</button>
-      <div class="carousel-images">
-        ${receta.Imagenes.map((imgUrl) => `<img src="${imgUrl}" alt="Imagen de receta">`).join('')}
-      </div>
-      <button class="btn right">&gt;</button>
-    `;
-    publicacion.appendChild(carousel);
-
-    const interacciones = document.createElement('div');
-    interacciones.classList.add('parent-div');
-    interacciones.innerHTML = `
-      <div class="child-div">
-                        <!-- Corazón -->
-                        <i class="fa-regular fa-heart fa-xl icon-off interact" data-receta="${receta.ID_Receta}" id="int-01" style="color: #000000;"></i> 
-                        <i class="fa-solid fa-heart fa-xl icon-on icon-on interact_" id="int-02" data-receta="${receta.ID_Receta}" style="color: #ff0000; display: none;"></i>
-                        <p>Me encanta</p>
-                    </div>
-                    <div class="child-div">
-                        <!-- Like -->
-                        <i class="fa-regular fa-thumbs-up fa-xl icon-off interact" id="int-03" data-receta="${receta.ID_Receta}" style="color: #000000;"></i>
-                        <i class="fa-solid fa-thumbs-up fa-xl icon-on interact_" id="int-04" data-receta="${receta.ID_Receta}" style="color: #11306f; display: none;"></i>
-                        <p>Me gusta</p>
-                    </div>
-                    <div class="child-div">
-                        <!-- Dislike -->
-                        <i class="fa-regular fa-thumbs-down fa-xl icon-off interact" id="int-05" data-receta="${receta.ID_Receta}" style="color: #000000;"></i>
-                        <i class="fa-solid fa-thumbs-down fa-xl icon-on interact_" id="int-06" data-receta="${receta.ID_Receta}" style="color: #11306f; display: none;"></i>
-                        <p>No me gusta</p>
-                    </div>
-    `;
-    publicacion.appendChild(interacciones);
-    publicacionesContainer.appendChild(publicacion);
-
-    setupCarousel(carousel);
-  });
+// Función para obtener interacciones (debe incluir la interacción del usuario)
+async function obtenerInteracciones(recetaId) {
+    try {
+        const url = userResult?.ID_Usuario 
+            ? `http://localhost:3000/get-interacciones/${recetaId}?usuarioId=${userResult.ID_Usuario}`
+            : `http://localhost:3000/get-interacciones/${recetaId}`;
+            
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success) {
+            return {
+                meEncanta: data.interacciones.meEncanta || 0, // Nota: viene de interacciones
+                meGusta: data.interacciones.meGusta || 0,     // Nota: viene de interacciones
+                noMeGusta: data.interacciones.noMeGusta || 0,  // Nota: viene de interacciones
+                usuarios: data.interacciones.usuarios || []     // Ahora correctamente anidado
+            };
+        }
+        return {
+            meEncanta: 0,
+            meGusta: 0,
+            noMeGusta: 0,
+            usuarios: []
+        };
+    } catch (error) {
+        console.error('Error al obtener interacciones:', error);
+        return {
+            meEncanta: 0,
+            meGusta: 0,
+            noMeGusta: 0,
+            usuarios: []
+        };
+    }
 }
 
+function agregarEventosInteraccion(publicacion, recetaId) {
+    const interacciones = publicacion.querySelectorAll('.interaccion');
+    
+    interacciones.forEach(interaccion => {
+        interaccion.addEventListener('click', async function() {
+            const tipo = this.dataset.tipo;
+            const icono = this.querySelector('i');
+            const contador = this.querySelector('.contador');
+            
+            // Guardar estado anterior para posible rollback
+            const estadoAnterior = {
+                clase: icono.className,
+                color: icono.style.color,
+                contador: contador.textContent
+            };
+            
+            // Cambio visual inmediato (optimistic UI)
+            const isActive = icono.classList.contains('fa-solid');
+            icono.classList.toggle('fa-regular');
+            icono.classList.toggle('fa-solid');
+            
+            // Aplicar colores según el tipo de interacción
+            if (icono.classList.contains('fa-solid')) {
+                // Icono activo
+                if (tipo === 'meEncanta') {
+                    icono.style.color = '#ff0000'; // Rojo para "Me encanta"
+                } else {
+                    icono.style.color = '#11306f'; // Azul para "Me gusta" y "No me gusta"
+                }
+            } else {
+                // Icono inactivo
+                icono.style.color = '#000000'; // Negro para todos cuando están inactivos
+            }
+            
+            try {
+                // Registrar la interacción en el servidor
+                const response = await fetch('http://localhost:3000/get-interacciones', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        recetaId: recetaId,
+                        tipo: tipo,
+                        usuarioId: userResult.ID_Usuario
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Actualizar todos los contadores y estados
+                    publicacion.querySelectorAll('.interaccion').forEach(item => {
+                        const tipoItem = item.dataset.tipo;
+                        const iconoItem = item.querySelector('i');
+                        const contadorItem = item.querySelector('.contador');
+                        
+                        // Actualizar contador
+                        contadorItem.textContent = data.nuevoTotal[tipoItem] || 0;
+                        
+                        // Actualizar estado del icono
+                        if (tipoItem === tipo) {
+                            // Mantener el estado actual del icono clickeado
+                            iconoItem.className = icono.className;
+                            iconoItem.style.color = icono.style.color;
+                        } else {
+                            // Desactivar otras interacciones
+                            iconoItem.classList.remove('fa-solid');
+                            iconoItem.classList.add('fa-regular');
+                            iconoItem.style.color = '#000000';
+                        }
+                    });
+                    
+                    console.log('Interacción actualizada:', {
+                        recetaId,
+                        tipo,
+                        nuevoTotal: data.nuevoTotal
+                    });
+                } else {
+                    // Revertir cambios si falló la respuesta del servidor
+                    icono.className = estadoAnterior.clase;
+                    icono.style.color = estadoAnterior.color;
+                    contador.textContent = estadoAnterior.contador;
+                }
+            } catch (error) {
+                console.error('Error al registrar interacción:', error);
+                // Revertir cambios visuales si hubo error
+                icono.className = estadoAnterior.clase;
+                icono.style.color = estadoAnterior.color;
+                contador.textContent = estadoAnterior.contador;
+            }
+        });
+    });
+}
 // Lo del carrusel
 function setupCarousel(carousel) {
   const imagesContainer = carousel.querySelector('.carousel-images');
@@ -375,7 +563,6 @@ tabs.forEach(tab => {
   });
 });
 
-document.addEventListener('DOMContentLoaded', fetchRecetas);
 
 document.addEventListener('DOMContentLoaded', () => {
   const editProfileBtn = document.getElementById('edit-profile');
@@ -420,19 +607,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.getElementById('logout').addEventListener('click', async () => {
   const token = localStorage.getItem('authToken');
-  
-  try {
-      // Opción 1: Si necesitas hacer una solicitud al servidor para cerrar sesión
-      await fetch('http://192.168.50.209:3000/logout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token }),
-      });
-  } catch (error) {
-      console.error('Error cerrando sesión:', error);
-  }
-
-  // Opción 2: Eliminar el token directamente en el frontend
   localStorage.removeItem('authToken');
   alert('Sesión cerrada. Redirigiendo a la página de inicio...');
   window.location.href = 'index.html';
@@ -455,7 +629,7 @@ document.getElementById('deactivate-account').addEventListener('click', async ()
   try {
       //console.log('Enviando userId al servidor:', userId); // Log para verificar
 
-      const response = await fetch('http://192.168.50.209:3000/deactivate-account', {
+      const response = await fetch('http://localhost:3000/deactivate-account', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId }),
@@ -505,66 +679,18 @@ function updateUserInterface() {
       // Ejemplo: actualizar nombre de usuario
       const userNameElement = document.getElementById('userName');
       if (userNameElement) {
-          userNameElement.textContent = userResult.Nombre + " " + userResult.ApellidoP + " " + userResult.ApellidoM;
+          userNameElement.textContent = userResult.Nombre + " " + userResult.Ape_Pat + " " + userResult.Ape_Mat;
       }
       
       // Ejemplo: actualizar imagen de perfil
-      if (userResult.imagen) {
-          const userImage = `http://192.168.50.209:3000${userResult.imagen}`;
+      if (userById.icon) {
+          const userImage = `${userById.icon}`;
+          console.log('Imagen de usuario:', userById.icon); // Verificar la URL de la imagen
           const userIconElement = document.getElementById('userIcon');
           if (userIconElement) {
               userIconElement.src = userImage;
           }
       }
-  }
-}
-
-async function setUserInteracts() {
-  try {
-      // Obtener las recetas desde el servidor
-      const recetasResponse = await fetch('http://192.168.50.209:3000/read-recetas');
-      const recetasData = await recetasResponse.json();
-      const recetas = recetasData.recetas;
-      recetasPagina = recetas;
-
-      // Filtrar las recetas que tienen interacciones del usuario logueado
-      const recetasFiltradas = recetas.filter(receta => 
-          receta.Interacciones.some(interaccion => interaccion.ID_User === userResult.ID_User)
-      );
-      //console.log(recetasFiltradas);
-      // Recorrer todas las recetas filtradas
-      recetasFiltradas.forEach(receta => {
-          // Recorrer las interacciones de cada receta
-          receta.Interacciones.forEach(interaccion => {
-              if (interaccion.ID_User === userResult.ID_User) {
-                  const recetaID = receta.ID_Receta;
-                  const tipoInteraccion = interaccion.Tipo_Interaccion;
-          
-                  // Mapear los tipos de interacción a los íconos
-                  const mapping = {
-                      'Me encanta': { off: 'int-01', on: 'int-02' },
-                      'Me gusta': { off: 'int-03', on: 'int-04' },
-                      'No me gusta': { off: 'int-05', on: 'int-06' }
-                  };
-          
-                  const interaccionIcons = mapping[tipoInteraccion];
-          
-                  if (interaccionIcons) {
-                      // Seleccionar los íconos específicos basados en data-receta
-                      const iconOff = document.querySelector(`i#${interaccionIcons.off}[data-receta="${recetaID}"]`);
-                      const iconOn = document.querySelector(`i#${interaccionIcons.on}[data-receta="${recetaID}"]`);
-          
-                      // Cambiar el estado de visibilidad de los íconos si existen
-                      if (iconOff && iconOn) {
-                          iconOff.style.display = 'none';
-                          iconOn.style.display = 'inline-block';
-                      }
-                  }
-              }
-          });
-      });
-  } catch (error) {
-      console.error('Error al actualizar las interacciones del usuario:', error);
   }
 }
 
@@ -772,25 +898,6 @@ function initRecipePublication() {
   });
 }
 
-// Call this function when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-  // Only initialize if the user is a chef
-  const token = localStorage.getItem('authToken');
-  const userData = JSON.parse(atob(token.split('.')[1]));
-  
-  fetch('http://192.168.50.209:3000/read-chefs')
-      .then(response => response.json())
-      .then(chefsData => {
-          const isChef = chefsData.chefs.some(chef => chef.ID_User === userData.userId);
-          
-          if (isChef) {
-              initRecipePublication();
-          }
-      })
-      .catch(error => {
-          console.error('Error checking chef status:', error);
-      });
-});
 
 document.addEventListener('click', (event) => {
   if (event.target.classList.contains('Id_receta')) {
@@ -847,44 +954,151 @@ function cambiarIconos(iconOff) {
   }
 }
 
-function registrarInteraccion(event) {
-  if (event.target.classList.contains('interact')) {
-      const interactID = event.target.id;
-      const receta = event.target.getAttribute('data-receta');
-      const fechaInteraccion = new Date().toISOString();
-      const tiposInteraccion = {
-          'int-01': 'Me encanta',
-          'int-03': 'Me gusta',
-          'int-05': 'No me gusta'
-      };
-      const descripcionInteraccion = tiposInteraccion[interactID] || interactID;
+// Función para inicializar el formulario de recetas
+function initRecipeForm() {
+  // Agregar ingredientes dinámicamente
+  document.getElementById('add-ingredient-btn').addEventListener('click', () => {
+    const container = document.getElementById('ingredients-container');
+    const div = document.createElement('div');
+    div.className = 'ingredient-input';
+    div.innerHTML = `
+      <input type="text" class="ingredient-name" placeholder="Nombre" required>
+      <input type="text" class="ingredient-amount" placeholder="Cantidad" required>
+      <select class="ingredient-unit" required>
+        <option value="gr">gr</option>
+        <option value="ml">ml</option>
+        <option value="tazas">tazas</option>
+        <option value="cucharadas">cucharadas</option>
+        <option value="unidades">unidades</option>
+      </select>
+      <button type="button" class="remove-btn">×</button>
+    `;
+    container.appendChild(div);
+    
+    div.querySelector('.remove-btn').addEventListener('click', () => {
+      container.removeChild(div);
+    });
+  });
 
-      const datos = {
-          tipoInteraccion: descripcionInteraccion,
-          idReceta: receta,
-          idUsuario: userResult.ID_User,
-          fechaInteraccion: fechaInteraccion
-      };
-
-      // Hacer la solicitud POST
-      fetch('http://192.168.50.209:3000/add-interaction', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(datos)
-      })
-      .then(response => response.json())
-      .then(data => {
-          setUserInteracts(); // Actualiza la UI después de la respuesta
-      })
-      .catch(error => {
-          console.error('Error al agregar la interacción:', error);
+  // Agregar pasos dinámicamente
+  document.getElementById('add-step-btn').addEventListener('click', () => {
+    const container = document.getElementById('steps-container');
+    const div = document.createElement('div');
+    div.className = 'step-input';
+    const stepNumber = container.children.length + 1;
+    div.innerHTML = `
+      <h4>Paso ${stepNumber}</h4>
+      <textarea class="step-description" placeholder="Descripción del paso" required></textarea>
+      <button type="button" class="remove-btn">×</button>
+    `;
+    container.appendChild(div);
+    
+    div.querySelector('.remove-btn').addEventListener('click', () => {
+      container.removeChild(div);
+      // Reindexar los pasos restantes
+      Array.from(container.children).forEach((child, index) => {
+        child.querySelector('h4').textContent = `Paso ${index + 1}`;
       });
+    });
+  });
 
-      // Después de registrar la interacción, cambia los iconos
-      if (event.target.classList.contains('icon-off')) {
-          cambiarIconos(event.target);
-      }
+  // Vista previa de imágenes
+  document.getElementById('recipe-images').addEventListener('change', function(e) {
+    const previewContainer = document.getElementById('image-preview-container');
+    previewContainer.innerHTML = '';
+    
+    Array.from(e.target.files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = document.createElement('img');
+        img.src = event.target.result;
+        previewContainer.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  // Manejar envío del formulario
+  recipeForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Recopilar datos del formulario
+    const recipeData = {
+      titulo: document.getElementById('recipe-title').value,
+      descripcion: document.getElementById('recipe-description').value,
+      tiempoPreparacion: document.getElementById('recipe-time').value,
+      dificultad: document.getElementById('recipe-difficulty').value,
+      ingredientes: [],
+      pasos: [],
+      imagenes: []
+    };
+
+    // Obtener ingredientes
+    document.querySelectorAll('.ingredient-input').forEach(input => {
+      recipeData.ingredientes.push({
+        nombre: input.querySelector('.ingredient-name').value,
+        cantidad: input.querySelector('.ingredient-amount').value,
+        unidad: input.querySelector('.ingredient-unit').value
+      });
+    });
+
+    // Obtener pasos
+    document.querySelectorAll('.step-input').forEach((input, index) => {
+      recipeData.pasos.push({
+        numero: index + 1,
+        descripcion: input.querySelector('.step-description').value
+      });
+    });
+
+    // Obtener imágenes (solo nombres para mostrar en consola)
+    recipeData.imagenes = Array.from(document.getElementById('recipe-images').files).map(f => f.name);
+
+    // Mostrar datos en consola
+    console.log('Datos de la receta a enviar:', recipeData);
+
+    try {
+  const formData = new FormData();
+
+  // Agregar campos simples
+  formData.append('titulo', recipeData.titulo);
+  formData.append('descripcion', recipeData.descripcion);
+  formData.append('tiempoPreparacion', recipeData.tiempoPreparacion);
+  formData.append('dificultad', recipeData.dificultad);
+
+  // Agregar ingredientes y pasos como JSON string
+  formData.append('ingredientes', JSON.stringify(recipeData.ingredientes));
+  formData.append('pasos', JSON.stringify(recipeData.pasos));
+
+  // Agregar imágenes
+  const imageFiles = document.getElementById('recipe-images').files;
+  for (let i = 0; i < imageFiles.length; i++) {
+    formData.append('imagenes', imageFiles[i]); // el nombre del campo debe coincidir con el backend
   }
+
+  const response = await fetch('/api/create-recipe', {
+    method: 'POST',
+    body: formData
+  });
+
+  const result = await response.json();
+  console.log('Respuesta del servidor:', result);
+
+  if (response.ok) {
+    alert('Receta creada con éxito!');
+    recipeModal.style.display = 'none';
+    recipeForm.reset();
+    document.getElementById('image-preview-container').innerHTML = '';
+  } else {
+    alert('Error al crear receta');
+  }
+} catch (error) {
+  console.error('Error al enviar receta:', error);
+  alert('Ocurrió un error al enviar la receta.');
 }
+
+    recipeModal.style.display = 'none';
+  });
+}
+
+// Inicializar el formulario cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', initRecipeForm);

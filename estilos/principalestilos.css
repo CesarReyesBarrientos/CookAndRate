@@ -428,13 +428,7 @@ p#userName {
 .menu-window.open {
     top: 0;
 }
-.menu-window a {
-    font-size: 20px;
-    margin: 10px 0;
-    text-decoration: none;
-    color: black;
-    font-family: "Noto Serif Ahom", serif;
-}
+
 .menu-window a:hover {
     text-decoration: underline;
 }
